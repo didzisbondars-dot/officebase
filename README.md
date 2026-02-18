@@ -202,3 +202,4 @@ Change `"USD"` to your local currency in `src/lib/utils.ts` `formatCurrency()`.
 - **Caching**: Add Redis for faster Airtable responses at scale
 - **Analytics**: Add PostHog or Plausible for tracking
 - **Search**: Replace client-side filter with Algolia for large datasets
+# officebase
