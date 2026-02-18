@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
-import { CompareBar } from "@/components/compare/CompareBar";
 import { Toaster } from "@/components/ui/toaster";
 
 export const metadata: Metadata = {
@@ -31,7 +30,6 @@ export default function RootLayout({
         <Navbar />
         <main className="flex-1">{children}</main>
         <Footer />
-        <CompareBar />
         <Toaster />
       </body>
     </html>
