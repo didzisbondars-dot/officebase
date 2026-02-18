@@ -177,7 +177,8 @@ export async function getProjectsByIds(ids: string[]): Promise<Project[]> {
 
 // Submit a lead inquiry
 export async function submitLead(lead: Lead): Promise<void> {
-  await base(LEADS_TABLE).create([
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  await (base(LEADS_TABLE) as any).create([
     {
       fields: {
         Name: lead.name,
