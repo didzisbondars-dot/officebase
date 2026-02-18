@@ -203,3 +203,4 @@ Change `"USD"` to your local currency in `src/lib/utils.ts` `formatCurrency()`.
 - **Analytics**: Add PostHog or Plausible for tracking
 - **Search**: Replace client-side filter with Algolia for large datasets
 # officebase
+# officebase
