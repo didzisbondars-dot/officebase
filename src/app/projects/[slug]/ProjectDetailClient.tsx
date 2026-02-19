@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { LeadForm } from "@/components/projects/LeadForm";
 import Link from "next/link";
 import { useState } from "react";
 import { ArrowLeft, MapPin, Building, Maximize2, Calendar, User, ChevronLeft, ChevronRight } from "lucide-react";
@@ -134,6 +135,9 @@ export default function ProjectDetailClient({ project }: { project: Project }) {
               )}
             </div>
           </div>
+
+          {/* Lead form */}
+          <LeadForm projectName={project.name} projectId={project.id} />
         </div>
       </div>
     </div>

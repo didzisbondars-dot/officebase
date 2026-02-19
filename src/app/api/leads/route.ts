@@ -1,39 +1,38 @@
 import { NextRequest, NextResponse } from "next/server";
-import { submitLead } from "@/lib/airtable";
-import { z } from "zod";
+import Airtable from "airtable";
 
-const leadSchema = z.object({
-  name: z.string().min(2, "Name must be at least 2 characters"),
-  email: z.string().email("Invalid email address"),
-  phone: z.string().optional(),
-  company: z.string().optional(),
-  projectId: z.string().min(1, "Project ID is required"),
-  projectName: z.string().min(1, "Project name is required"),
-  message: z.string().min(10, "Message must be at least 10 characters"),
-  unitSize: z.number().optional(),
-  budget: z.number().optional(),
-});
+const base = new Airtable({ apiKey: process.env.AIRTABLE_API_KEY }).base(
+  process.env.AIRTABLE_BASE_ID!
+);
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const validation = leadSchema.safeParse(body);
+    const { name, company, email, phone, sqm, message, projectName, projectId } = body;
 
-    if (!validation.success) {
-      return NextResponse.json(
-        { error: "Validation failed", details: validation.error.flatten() },
-        { status: 400 }
-      );
+    if (!name || !email) {
+      return NextResponse.json({ error: "Name and email required" }, { status: 400 });
     }
 
-    await submitLead(validation.data);
+    // @ts-ignore
+    await base(process.env.AIRTABLE_LEADS_TABLE || "Leads").create([{
+      fields: {
+        "Name": name,
+        "Company": company || "",
+        "Email": email,
+        "Phone": phone || "",
+        "Space Needed (sqm)": sqm ? Number(sqm) : undefined,
+        "Message": message || "",
+        "Project": projectName,
+        "Project ID": projectId,
+        "Status": "New",
+        "Source": "Website",
+      }
+    }]);
 
-    return NextResponse.json({ success: true }, { status: 201 });
+    return NextResponse.json({ success: true });
   } catch (error) {
-    console.error("Error submitting lead:", error);
-    return NextResponse.json(
-      { error: "Failed to submit inquiry" },
-      { status: 500 }
-    );
+    console.error("Lead submission error:", error);
+    return NextResponse.json({ error: "Failed to submit" }, { status: 500 });
   }
 }
