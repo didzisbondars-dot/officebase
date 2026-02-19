@@ -73,6 +73,23 @@ export default async function HomePage() {
                 Explore Map
               </Link>
             </div>
+
+            {/* Trust bar */}
+            <div className="mt-12 animate-fade-up stagger-3">
+              <p className="text-xs text-white/40 uppercase tracking-widest mb-5 font-medium">Trusted by</p>
+              <div className="flex flex-wrap items-center gap-8">
+                {[
+                  { name: "Citadele", text: "CITADELE" },
+                  { name: "Swedbank", text: "Swedbank" },
+                  { name: "Elko Grupa", text: "ELKO GRUPA" },
+                  { name: "Printful", text: "Printful" },
+                ].map((brand) => (
+                  <div key={brand.name} className="text-white/30 hover:text-white/60 transition-colors font-semibold text-lg tracking-tight">
+                    {brand.text}
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
 
