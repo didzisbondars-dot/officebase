@@ -21,7 +21,7 @@ function transformRecord(record: any): Project {
   const name = fields["Project name"] || fields["Project Name"] || "";
   return {
     id: record.id,
-    slug: fields["Slug"] || slugify(name || record.id),
+    slug: fields["Slug"] ? slugify(fields["Slug"]) : slugify(name || record.id),
     name,
     developer: fields["Owner"] || fields["Developer"] || "",
     developerLogo: undefined,
@@ -30,8 +30,8 @@ function transformRecord(record: any): Project {
     address: fields["Adress"] || fields["Address"] || "",
     city: "Riga",
     district: fields["City Area"] || fields["District"] || "",
-    latitude: parseFloat(fields["Latitude"]) || 0,
-    longitude: parseFloat(fields["Longitude"]) || 0,
+    latitude: fields["Latitude"] ? parseFloat(String(fields["Latitude"])) : 0,
+    longitude: fields["Longitude"] ? parseFloat(String(fields["Longitude"])) : 0,
     totalArea: parseFloat(String(fields["GBA"] || 0).replace(/\s/g, "")) || 0,
     minUnitSize: parseFloat(String(fields["GLA"] || 0).replace(/\s/g, "")) || 0,
     maxUnitSize: parseFloat(String(fields["GLA"] || 0).replace(/\s/g, "")) || 0,
