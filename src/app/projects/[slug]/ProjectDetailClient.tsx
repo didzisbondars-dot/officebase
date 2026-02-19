@@ -1,11 +1,16 @@
 "use client";
+
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowLeft, MapPin, Building, Maximize2, Calendar, User } from "lucide-react";
+import { useState } from "react";
+import { ArrowLeft, MapPin, Building, Maximize2, Calendar, User, ChevronLeft, ChevronRight } from "lucide-react";
 import type { Project } from "@/types";
 import { formatArea, formatCurrency, getStatusColor, getStatusDot, cn } from "@/lib/utils";
 
 export default function ProjectDetailClient({ project }: { project: Project }) {
+  const [imgIndex, setImgIndex] = useState(0);
+  const images = project.images;
+
   return (
     <div className="min-h-screen bg-[var(--brand-warm)] pt-20">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -13,10 +18,51 @@ export default function ProjectDetailClient({ project }: { project: Project }) {
           <ArrowLeft className="w-4 h-4" /> Back to Projects
         </Link>
 
-        {/* Image */}
-        {project.images.length > 0 && (
-          <div className="relative h-72 rounded-2xl overflow-hidden mb-8 bg-muted">
-            <Image src={project.images[0].url} alt={project.name} fill className="object-cover" />
+        {/* Main image */}
+        {images.length > 0 && (
+          <div className="mb-4">
+            <div className="relative h-96 rounded-2xl overflow-hidden bg-muted group">
+              <Image src={images[imgIndex].url} alt={project.name} fill className="object-cover transition-all duration-500" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
+
+              {images.length > 1 && (
+                <>
+                  <button
+                    onClick={() => setImgIndex((i) => (i - 1 + images.length) % images.length)}
+                    className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-black/50 hover:bg-black/70 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity"
+                  >
+                    <ChevronLeft className="w-5 h-5" />
+                  </button>
+                  <button
+                    onClick={() => setImgIndex((i) => (i + 1) % images.length)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-black/50 hover:bg-black/70 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity"
+                  >
+                    <ChevronRight className="w-5 h-5" />
+                  </button>
+                  <div className="absolute bottom-3 right-3 bg-black/50 text-white text-xs px-2.5 py-1 rounded-full">
+                    {imgIndex + 1} / {images.length}
+                  </div>
+                </>
+              )}
+            </div>
+
+            {/* Thumbnails */}
+            {images.length > 1 && (
+              <div className="flex gap-2 mt-3 overflow-x-auto pb-1">
+                {images.map((img, i) => (
+                  <button
+                    key={img.id}
+                    onClick={() => setImgIndex(i)}
+                    className={cn(
+                      "relative w-20 h-14 rounded-lg overflow-hidden shrink-0 border-2 transition-all",
+                      i === imgIndex ? "border-[var(--brand-gold)]" : "border-transparent opacity-60 hover:opacity-100"
+                    )}
+                  >
+                    <Image src={img.url} alt="" fill className="object-cover" />
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
         )}
 
@@ -60,11 +106,11 @@ export default function ProjectDetailClient({ project }: { project: Project }) {
               {[
                 { icon: Building, label: "Class", value: project.propertyType },
                 { icon: User, label: "Owner", value: project.developer },
-                { icon: Maximize2, label: "Total Area", value: project.totalArea ? formatArea(project.totalArea) : "—" },
-                { icon: Maximize2, label: "GLA", value: project.minUnitSize ? formatArea(project.minUnitSize) : "—" },
-                { icon: Building, label: "Floors", value: project.floors ? `${project.floors} floors` : "—" },
-                { icon: Calendar, label: "Completion", value: project.completionDate || "—" },
-              ].map(({ icon: Icon, label, value }) => value && value !== "—" ? (
+                { icon: Maximize2, label: "Total Area", value: project.totalArea ? formatArea(project.totalArea) : null },
+                { icon: Maximize2, label: "GLA", value: project.minUnitSize ? formatArea(project.minUnitSize) : null },
+                { icon: Building, label: "Floors", value: project.floors ? `${project.floors} floors` : null },
+                { icon: Calendar, label: "Completion", value: project.completionDate || null },
+              ].filter(row => row.value).map(({ icon: Icon, label, value }) => (
                 <div key={label} className="flex items-start gap-3">
                   <Icon className="w-4 h-4 text-muted-foreground mt-0.5 shrink-0" />
                   <div>
@@ -72,7 +118,7 @@ export default function ProjectDetailClient({ project }: { project: Project }) {
                     <p className="text-sm font-medium">{value}</p>
                   </div>
                 </div>
-              ) : null)}
+              ))}
 
               {project.salePricePerSqm && (
                 <div className="pt-3 border-t border-border">
