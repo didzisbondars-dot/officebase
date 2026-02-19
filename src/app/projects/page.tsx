@@ -5,6 +5,7 @@ import { ProjectCard } from "@/components/projects/ProjectCard";
 import { SearchFiltersPanel } from "@/components/projects/SearchFilters";
 import { MapView } from "@/components/map/MapView";
 import { CompareProvider } from "@/components/compare/CompareContext";
+import { CompareBar } from "@/components/compare/CompareBar";
 import type { Project, SearchFilters } from "@/types";
 import { Building2, LayoutGrid, List, Map, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -183,6 +184,7 @@ export default function ProjectsPage() {
           )}
         </div>
       </div>
+      <CompareBar />
     </CompareProvider>
   );
 }
