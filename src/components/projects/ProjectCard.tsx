@@ -44,14 +44,14 @@ export function ProjectCard({ project, className }: ProjectCardProps) {
             />
           ) : (
             <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-muted to-secondary">
-              <span className="font-display text-4xl text-muted-foreground/30">
+              <span className="font-display text-4xl text-muted-foreground/50">
                 {project.name.charAt(0)}
               </span>
             </div>
           )}
 
           {/* Overlays */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
 
           {/* Status badge */}
           <div className="absolute top-3 left-3">

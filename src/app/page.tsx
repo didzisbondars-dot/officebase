@@ -31,7 +31,7 @@ export default async function HomePage() {
 
         {/* Gradient overlays */}
         <div className="absolute inset-0 bg-gradient-to-br from-[var(--brand-navy)] via-[var(--brand-navy)] to-[#1a3a6b]" />
-        <div className="absolute bottom-0 left-0 right-0 h-48 bg-gradient-to-t from-black/30 to-transparent" />
+        <div className="absolute bottom-0 left-0 right-0 h-48 bg-gradient-to-t from-black/50 to-transparent" />
 
         {/* Decorative elements */}
         <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-[var(--brand-gold)]/10 rounded-full blur-3xl" />

@@ -173,7 +173,7 @@ export function MapView({ projects, className, selectedId, onProjectSelect }: Ma
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
               <div className="absolute bottom-2 left-3">
-                <span className="text-xs font-medium text-white/90 bg-black/30 px-2 py-0.5 rounded-full">
+                <span className="text-xs font-medium text-white/90 bg-black/50 px-2 py-0.5 rounded-full">
                   {selectedProject.status}
                 </span>
               </div>
