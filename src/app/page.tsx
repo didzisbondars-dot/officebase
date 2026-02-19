@@ -47,13 +47,13 @@ export default async function HomePage() {
               </span>
             </div>
 
-            <h1 className="font-display text-5xl sm:text-6xl lg:text-7xl text-white leading-tight mb-6 animate-fade-up stagger-1">
+            <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl text-white leading-tight mb-4 animate-fade-up stagger-1">
               Find Your Next
               <br />
               <em className="not-italic text-[var(--brand-gold)]">Office Space</em>
             </h1>
 
-            <p className="text-lg text-white/70 leading-relaxed mb-8 max-w-xl animate-fade-up stagger-2">
+            <p className="text-base text-white/70 leading-relaxed mb-6 max-w-xl animate-fade-up stagger-2">
               Curated Grade A offices, co-working spaces, and mixed-use developments. Compare projects, explore on the map, and connect with developers directly.
             </p>
 
