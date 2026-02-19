@@ -59,6 +59,8 @@ export interface SearchFilters {
   propertyType?: string[];
   minArea?: number;
   maxArea?: number;
+  minRent?: number;
+  maxRent?: number;
   minPrice?: number;
   maxPrice?: number;
   amenities?: string[];
@@ -100,8 +102,6 @@ export const CERTIFICATION_OPTIONS = [
 export const STATUS_OPTIONS = [
   "Available",
   "Under Construction",
-  "Sold Out",
-  "Coming Soon",
 ] as const;
 
 export const PROPERTY_TYPE_OPTIONS = [

@@ -27,6 +27,7 @@ export function SearchFiltersPanel({
   const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [minArea, setMinArea] = useState("");
+  const [rentRange, setRentRange] = useState<[number, number]>([0, 30]);
   const [maxArea, setMaxArea] = useState("");
 
   const applyFilters = useCallback(
@@ -87,11 +88,12 @@ export function SearchFiltersPanel({
     setSelectedTypes([]);
     setMinArea("");
     setMaxArea("");
+    setRentRange([0, 30]);
     onFiltersChange({});
   };
 
   const hasFilters =
-    query || city || selectedStatus.length || selectedTypes.length || minArea || maxArea;
+    query || city || selectedStatus.length || selectedTypes.length || minArea || maxArea || rentRange[0] > 0 || rentRange[1] < 30;
 
   return (
     <div className={cn("bg-white rounded-2xl border border-border p-5", className)}>
@@ -162,6 +164,42 @@ export function SearchFiltersPanel({
             {type}
           </button>
         ))}
+      </div>
+
+      {/* Rent rate slider */}
+      <div className="mb-4">
+        <div className="flex items-center justify-between mb-2">
+          <label className="text-sm font-medium text-foreground/70">Asking Rent Rate</label>
+          <span className="text-sm font-semibold text-[var(--brand-navy)]">
+            {rentRange[1] >= 30 ? "Any price" : `up to €${rentRange[1]}/sqm`}
+          </span>
+        </div>
+        <input
+          type="range"
+          min={0}
+          max={30}
+          step={1}
+          value={rentRange[1]}
+          onChange={(e) => {
+            const val = Number(e.target.value);
+            const next: [number, number] = [0, val];
+            setRentRange(next);
+            onFiltersChange({
+              query: query || undefined,
+              city: city || undefined,
+              status: selectedStatus.length ? selectedStatus : undefined,
+              propertyType: selectedTypes.length ? selectedTypes : undefined,
+              maxRent: val < 30 ? val : undefined,
+            });
+          }}
+          className="w-full h-2 bg-border rounded-full appearance-none cursor-pointer accent-[var(--brand-navy)]"
+        />
+        <div className="flex justify-between text-xs text-muted-foreground mt-1">
+          <span>€0</span>
+          <span>€10</span>
+          <span>€20</span>
+          <span>€30+</span>
+        </div>
       </div>
 
       {/* Advanced filters */}
