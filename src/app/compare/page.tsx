@@ -27,9 +27,14 @@ function CompareContent() {
       .finally(() => setLoading(false));
   }, [idsParam]);
 
-  const cols = `200px repeat(${projects.length}, 1fr)`;
-  const allAmenities = [...new Set(projects.flatMap((p) => p.amenities))].sort();
-  const allCerts = [...new Set(projects.flatMap((p) => p.certifications))].sort();
+  const rows = [
+    { label: "Property Type", fn: (p: Project) => p.propertyType },
+    { label: "Total Area", fn: (p: Project) => p.totalArea ? formatArea(p.totalArea) : "—" },
+    { label: "GLA", fn: (p: Project) => p.minUnitSize ? formatArea(p.minUnitSize) : "—" },
+    { label: "Owner/Developer", fn: (p: Project) => p.developer || "—" },
+    { label: "District", fn: (p: Project) => p.district || "—" },
+    { label: "Address", fn: (p: Project) => p.address || "—" },
+  ];
 
   if (loading) return <div className="min-h-screen pt-24 flex items-center justify-center"><p className="text-muted-foreground">Loading...</p></div>;
   if (!projects.length) return (
@@ -42,14 +47,46 @@ function CompareContent() {
   return (
     <div className="min-h-screen bg-[var(--brand-warm)] pt-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="flex items-center gap-4 mb-8">
+        <div className="flex items-center gap-4 mb-6">
           <Link href="/projects" className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground">
-            <ArrowLeft className="w-4 h-4" />Back to Projects
+            <ArrowLeft className="w-4 h-4" />Back
           </Link>
-          <h1 className="font-display text-3xl text-[var(--brand-navy)]">Compare Projects</h1>
+          <h1 className="font-display text-2xl sm:text-3xl text-[var(--brand-navy)]">Compare Projects</h1>
         </div>
-        <div className="bg-white rounded-2xl border border-border overflow-hidden">
-          <div className="grid border-b border-border" style={{ gridTemplateColumns: cols }}>
+
+        {/* Mobile: stacked cards */}
+        <div className="block lg:hidden space-y-6">
+          {projects.map((p) => (
+            <div key={p.id} className="bg-white rounded-2xl border border-border overflow-hidden">
+              <div className="relative h-48">
+                {p.images[0] ? <Image src={p.images[0].url} alt={p.name} fill className="object-cover" /> : <div className="w-full h-full bg-muted" />}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+                <div className="absolute bottom-3 left-3">
+                  <span className={cn("inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full border", getStatusColor(p.status))}>
+                    <span className={cn("w-1.5 h-1.5 rounded-full", getStatusDot(p.status))} />{p.status}
+                  </span>
+                </div>
+              </div>
+              <div className="p-4">
+                <h3 className="font-display text-xl mb-1">{p.name}</h3>
+                <p className="text-xs text-muted-foreground flex items-center gap-1 mb-4"><MapPin className="w-3 h-3" />{p.district}, {p.city}</p>
+                <div className="space-y-3">
+                  {rows.map((row) => (
+                    <div key={row.label} className="flex justify-between items-center py-2 border-b border-border last:border-0">
+                      <span className="text-sm text-muted-foreground">{row.label}</span>
+                      <span className="text-sm font-medium">{row.fn(p)}</span>
+                    </div>
+                  ))}
+                </div>
+                <Link href={`/projects/${p.slug}`} className="mt-4 block text-center text-sm font-medium text-[var(--brand-navy)] hover:underline">View Project →</Link>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Desktop: table */}
+        <div className="hidden lg:block bg-white rounded-2xl border border-border overflow-hidden">
+          <div className="grid border-b border-border" style={{ gridTemplateColumns: `200px repeat(${projects.length}, 1fr)` }}>
             <div className="p-5 bg-muted/40" />
             {projects.map((p) => (
               <div key={p.id} className="p-5 border-l border-border">
@@ -65,37 +102,12 @@ function CompareContent() {
               </div>
             ))}
           </div>
-          {[
-            { label: "Property Type", fn: (p: Project) => p.propertyType },
-            { label: "Total Area", fn: (p: Project) => p.totalArea ? formatArea(p.totalArea) : "—" },
-            { label: "GLA", fn: (p: Project) => p.minUnitSize ? formatArea(p.minUnitSize) : "—" },
-            { label: "Owner/Developer", fn: (p: Project) => p.developer || "—" },
-            { label: "District", fn: (p: Project) => p.district || "—" },
-            { label: "Address", fn: (p: Project) => p.address || "—" },
-          ].map((row) => (
-            <div key={row.label} className="grid border-b border-border hover:bg-muted/20" style={{ gridTemplateColumns: cols }}>
+          {rows.map((row) => (
+            <div key={row.label} className="grid border-b border-border hover:bg-muted/20" style={{ gridTemplateColumns: `200px repeat(${projects.length}, 1fr)` }}>
               <div className="p-4 text-sm font-medium text-muted-foreground bg-muted/20">{row.label}</div>
               {projects.map((p) => <div key={p.id} className="p-4 border-l border-border text-sm">{row.fn(p)}</div>)}
             </div>
           ))}
-          {allAmenities.length > 0 && <>
-            <div className="grid bg-muted/40 border-b border-border" style={{ gridTemplateColumns: cols }}><div className="p-4 font-semibold text-sm col-span-full">Amenities</div></div>
-            {allAmenities.map((a) => (
-              <div key={a} className="grid border-b border-border hover:bg-muted/20" style={{ gridTemplateColumns: cols }}>
-                <div className="p-4 text-sm text-muted-foreground bg-muted/20">{a}</div>
-                {projects.map((p) => <div key={p.id} className="p-4 border-l border-border">{p.amenities.includes(a) ? <CheckCircle2 className="w-4 h-4 text-emerald-500" /> : <XCircle className="w-4 h-4 text-muted-foreground/30" />}</div>)}
-              </div>
-            ))}
-          </>}
-          {allCerts.length > 0 && <>
-            <div className="grid bg-muted/40 border-b border-border" style={{ gridTemplateColumns: cols }}><div className="p-4 font-semibold text-sm col-span-full">Certifications</div></div>
-            {allCerts.map((c) => (
-              <div key={c} className="grid border-b border-border hover:bg-muted/20" style={{ gridTemplateColumns: cols }}>
-                <div className="p-4 text-sm text-muted-foreground bg-muted/20">{c}</div>
-                {projects.map((p) => <div key={p.id} className="p-4 border-l border-border">{p.certifications.includes(c) ? <CheckCircle2 className="w-4 h-4 text-emerald-500" /> : <XCircle className="w-4 h-4 text-muted-foreground/30" />}</div>)}
-              </div>
-            ))}
-          </>}
         </div>
       </div>
     </div>
