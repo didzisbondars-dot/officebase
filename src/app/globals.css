@@ -171,3 +171,24 @@
     overflow-wrap: break-word !important;
     display: block !important;
 }
+
+/* Final Force-Fix for Mapbox Popups */
+.mapboxgl-popup {
+    max-width: 280px !important;
+}
+
+.mapboxgl-popup-content {
+    width: 280px !important; /* Force a static width instead of a range */
+    padding: 12px 16px !important;
+    overflow-wrap: anywhere !important;
+}
+
+.mapboxgl-popup-content h3, 
+.mapboxgl-popup-content div,
+.mapboxgl-popup-content span {
+    white-space: normal !important;
+    word-break: normal !important;
+    overflow-wrap: anywhere !important;
+    display: block !important;
+    width: 100% !important;
+}
