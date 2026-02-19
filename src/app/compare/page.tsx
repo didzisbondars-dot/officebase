@@ -3,10 +3,10 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { ArrowLeft, X } from "lucide-react";
-import type { Project } from "@/types";
+import { getCompareProjects } from "./actions";
 
 export default function ComparePage() {
-  const [projects, setProjects] = useState<Project[]>([]);
+  const [projects, setProjects] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -15,14 +15,12 @@ export default function ComparePage() {
       try {
         const ids = JSON.parse(saved);
         if (Array.isArray(ids) && ids.length > 0) {
-          // Fetch from your secure internal API instead of Airtable SDK directly
-          fetch('/api/projects')
-            .then(res => res.json())
-            .then((allProjects: Project[]) => {
-              const filtered = allProjects.filter(p => ids.includes(p.id));
-              setProjects(filtered);
+          // Calls our new secure Server Action
+          getCompareProjects(ids)
+            .then(data => {
+              if (data) setProjects(data);
             })
-            .catch(err => console.error("Fetch error:", err))
+            .catch(err => console.error("Action error:", err))
             .finally(() => setLoading(false));
         } else {
           setLoading(false);
@@ -45,7 +43,7 @@ export default function ComparePage() {
 
   if (!projects || projects.length === 0) return (
     <div className="min-h-screen pt-24 flex flex-col items-center justify-center gap-4">
-      <p className="text-muted-foreground text-lg">No projects selected for comparison.</p>
+      <p className="text-slate-500 text-lg">No projects selected for comparison.</p>
       <Link href="/projects" className="px-6 py-2 bg-[#1B2B44] text-white rounded-lg hover:opacity-90 transition-opacity">
         Back to Projects
       </Link>
