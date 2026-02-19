@@ -92,7 +92,7 @@ export default function ProjectDetailClient({ project }: { project: Project }) {
               </div>
 
               {/* Rent price */}
-              {project.rentPricePerSqm > 0 && (
+              {!!project.rentPricePerSqm && project.rentPricePerSqm > 0 && (
                 <div className="flex items-center justify-between p-4 bg-[var(--brand-navy)]/5 rounded-xl border border-[var(--brand-navy)]/10">
                   <span className="text-sm font-medium text-[var(--brand-navy)]">Asking Rent Rate</span>
                   <span className="text-xl font-bold text-[var(--brand-navy)]">€{project.rentPricePerSqm} <span className="text-sm font-normal text-muted-foreground">/ sqm / mo</span></span>
