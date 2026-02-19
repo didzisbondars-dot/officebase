@@ -11,6 +11,7 @@ import {
 } from "@/types";
 
 interface SearchFiltersProps {
+  districts?: string[];
   onFiltersChange: (filters: SearchFilters) => void;
   cities?: string[];
   className?: string;

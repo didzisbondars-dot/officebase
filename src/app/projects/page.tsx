@@ -17,7 +17,7 @@ export default function ProjectsPage() {
   const [loading, setLoading] = useState(true);
   const [total, setTotal] = useState(0);
   const [viewMode, setViewMode] = useState<ViewMode>("grid");
-  const [cities, setCities] = useState<string[]>([]);
+  const [districts] = useState<string[]>(["Centrs", "Labais krasts", "Pārdaugava", "Skanste", "Vecrīga"]);
   const [selectedProjectId, setSelectedProjectId] = useState<string>();
 
   const fetchProjects = useCallback(async (filters: SearchFilters = {}) => {
@@ -42,18 +42,7 @@ export default function ProjectsPage() {
     }
   }, []);
 
-  // Fetch cities for dropdown
-  useEffect(() => {
-    fetch("/api/projects")
-      .then((r) => r.json())
-      .then((data) => {
-        const allCities = [
-          ...new Set((data.data as Project[]).map((p) => p.city).filter(Boolean)),
-        ].sort();
-        setCities(allCities as string[]);
-      })
-      .catch(() => {});
-  }, []);
+  
 
   useEffect(() => {
     fetchProjects();
@@ -76,7 +65,7 @@ export default function ProjectsPage() {
           {/* Filters */}
           <SearchFiltersPanel
             onFiltersChange={fetchProjects}
-            cities={cities}
+            districts={districts}
             className="mb-6"
           />
 
