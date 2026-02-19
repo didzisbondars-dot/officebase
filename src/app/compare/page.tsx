@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { ArrowLeft, X } from "lucide-react";
-import { getProjectsByIds } from "@/lib/airtable";
 import type { Project } from "@/types";
 
 export default function ComparePage() {
@@ -16,9 +15,12 @@ export default function ComparePage() {
       try {
         const ids = JSON.parse(saved);
         if (Array.isArray(ids) && ids.length > 0) {
-          getProjectsByIds(ids)
-            .then(data => {
-              if (data) setProjects(data);
+          // Fetch from your secure internal API instead of Airtable SDK directly
+          fetch('/api/projects')
+            .then(res => res.json())
+            .then((allProjects: Project[]) => {
+              const filtered = allProjects.filter(p => ids.includes(p.id));
+              setProjects(filtered);
             })
             .catch(err => console.error("Fetch error:", err))
             .finally(() => setLoading(false));
@@ -44,20 +46,20 @@ export default function ComparePage() {
   if (!projects || projects.length === 0) return (
     <div className="min-h-screen pt-24 flex flex-col items-center justify-center gap-4">
       <p className="text-muted-foreground text-lg">No projects selected for comparison.</p>
-      <Link href="/projects" className="px-6 py-2 bg-[var(--brand-navy)] text-white rounded-lg hover:opacity-90 transition-opacity">
+      <Link href="/projects" className="px-6 py-2 bg-[#1B2B44] text-white rounded-lg hover:opacity-90 transition-opacity">
         Back to Projects
       </Link>
     </div>
   );
 
   return (
-    <div className="min-h-screen bg-[var(--brand-warm)] pt-20">
+    <div className="min-h-screen bg-[#FDFCFB] pt-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex items-center gap-4 mb-8">
-          <Link href="/projects" className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground">
+          <Link href="/projects" className="flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-900">
             <ArrowLeft className="w-4 h-4" />Back
           </Link>
-          <h1 className="text-3xl font-bold">Compare ({projects.length}/3)</h1>
+          <h1 className="text-3xl font-bold text-[#1B2B44]">Compare ({projects.length}/3)</h1>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -80,8 +82,8 @@ export default function ComparePage() {
 
               <div className="p-6 flex-grow flex flex-col">
                 <div className="mb-6">
-                  <h3 className="font-bold text-xl leading-tight mb-1">{project.name || "Unnamed Project"}</h3>
-                  <p className="text-sm text-muted-foreground">{project.developer || "Developer N/A"}</p>
+                  <h3 className="font-bold text-xl leading-tight mb-1 text-[#1B2B44]">{project.name || "Unnamed Project"}</h3>
+                  <p className="text-sm text-slate-500">{project.developer || "Developer N/A"}</p>
                 </div>
                 
                 <div className="space-y-4 text-sm border-t border-slate-100 pt-6 mt-auto">
