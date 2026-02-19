@@ -50,8 +50,8 @@ export function MapView({ projects, className, selectedId, onProjectSelect }: Ma
         
         validProjects.forEach((project) => {
           const color =
-            project.propertyType === "A" ? "#c8882a" :
-            project.propertyType === "B" ? "#0f1f3d" : "#6b7280";
+            project.propertyType.includes("A") ? "#c8882a" :
+            project.propertyType.includes("B") ? "#0f1f3d" : "#6b7280";
 
           const el = document.createElement("div");
           el.style.cssText = `
