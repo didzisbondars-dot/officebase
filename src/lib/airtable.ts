@@ -58,15 +58,7 @@ function slugify(text: string): string {
 }
 
 export async function getProjects(filters?: SearchFilters): Promise<Project[]> {
-  const filterFormulas: string[] = [];
-  if (filters?.status?.length) filterFormulas.push(`OR(${filters.status.map((s) => `{Status} = "${s}"`).join(", ")})`);
-  if (filters?.propertyType?.length) filterFormulas.push(`OR(${filters.propertyType.map((t) => `{Building class} = "${t}"`).join(", ")})`);
-  if (filters?.city) filterFormulas.push(`{City Area} = "${filters.city}"`);
-  if (filters?.minArea) filterFormulas.push(`{GBA} >= ${filters.minArea}`);
-  if (filters?.maxArea) filterFormulas.push(`{GBA} <= ${filters.maxArea}`);
-  const formula = filterFormulas.length > 1 ? `AND(${filterFormulas.join(", ")})` : filterFormulas.length === 1 ? filterFormulas[0] : "";
   const records = await base(PROJECTS_TABLE).select({
-    
     sort: [{ field: "Project name", direction: "asc" }],
   }).all();
   let projects = records.map(transformRecord);
@@ -74,6 +66,10 @@ export async function getProjects(filters?: SearchFilters): Promise<Project[]> {
     const q = filters.query.toLowerCase();
     projects = projects.filter((p) => p.name.toLowerCase().includes(q) || p.developer.toLowerCase().includes(q) || p.address.toLowerCase().includes(q) || p.district.toLowerCase().includes(q));
   }
+  if (filters?.status?.length) projects = projects.filter((p) => filters.status!.includes(p.status));
+  if (filters?.propertyType?.length) projects = projects.filter((p) => filters.propertyType!.includes(p.propertyType));
+  if (filters?.minArea) projects = projects.filter((p) => p.totalArea >= filters.minArea!);
+  if (filters?.maxArea) projects = projects.filter((p) => p.totalArea <= filters.maxArea!);
   return projects;
 }
 
@@ -84,7 +80,10 @@ export async function getProjectBySlug(slug: string): Promise<Project | null> {
 }
 
 export async function getFeaturedProjects(limit = 6): Promise<Project[]> {
-  const records = await base(PROJECTS_TABLE).select({ maxRecords: limit, sort: [{ field: "Project name", direction: "asc" }] }).all();
+  const records = await base(PROJECTS_TABLE).select({
+    maxRecords: limit,
+    sort: [{ field: "Project name", direction: "asc" }],
+  }).all();
   return records.map(transformRecord);
 }
 
