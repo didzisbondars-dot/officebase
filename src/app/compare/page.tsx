@@ -42,7 +42,7 @@ function CompareContent() {
           <h1 className="font-display text-3xl text-[var(--brand-navy)]">Compare Projects</h1>
         </div>
         <div className="bg-white rounded-2xl border border-border overflow-hidden">
-          <div className="grid border-b border-border" style={{ gridTemplateColumns: cols }}>
+          <div className="overflow-x-auto pb-4"><div className="min-w-[1000px] grid border-b border-border" style={{ gridTemplateColumns: cols }}>
             <div className="p-5 bg-muted/40" />
             {projects.map((p) => (
               <div key={p.id} className="p-5 border-l border-border">
@@ -74,7 +74,7 @@ function CompareContent() {
             </div>
           ))}
           {allAmenities.length > 0 && <>
-            <div className="grid bg-muted/40 border-b border-border" style={{ gridTemplateColumns: cols }}><div className="p-4 font-semibold text-sm col-span-full">Amenities</div></div>
+            <div className="overflow-x-auto pb-4"><div className="min-w-[1000px] grid bg-muted/40 border-b border-border" style={{ gridTemplateColumns: cols }}><div className="p-4 font-semibold text-sm col-span-full">Amenities</div></div>
             {allAmenities.map((a) => (
               <div key={a} className="grid border-b border-border hover:bg-muted/20" style={{ gridTemplateColumns: cols }}>
                 <div className="p-4 text-sm text-muted-foreground bg-muted/20">{a}</div>
@@ -83,7 +83,7 @@ function CompareContent() {
             ))}
           </>}
           {allCerts.length > 0 && <>
-            <div className="grid bg-muted/40 border-b border-border" style={{ gridTemplateColumns: cols }}><div className="p-4 font-semibold text-sm col-span-full">Certifications</div></div>
+            <div className="overflow-x-auto pb-4"><div className="min-w-[1000px] grid bg-muted/40 border-b border-border" style={{ gridTemplateColumns: cols }}><div className="p-4 font-semibold text-sm col-span-full">Certifications</div></div>
             {allCerts.map((c) => (
               <div key={c} className="grid border-b border-border hover:bg-muted/20" style={{ gridTemplateColumns: cols }}>
                 <div className="p-4 text-sm text-muted-foreground bg-muted/20">{c}</div>
