@@ -67,7 +67,7 @@ export function MapView({ projects, className, onProjectSelect }: MapViewProps) 
           type: "circle",
           source: "projects",
           paint: {
-            "circle-radius": 8,
+            "circle-radius": 11,
             "circle-color": ["get", "color"],
             "circle-stroke-width": 2,
             "circle-stroke-color": "#ffffff",
@@ -103,7 +103,7 @@ export function MapView({ projects, className, onProjectSelect }: MapViewProps) 
         // Cursor
         map.on("mouseenter", "projects-circles", () => {
           map.getCanvas().style.cursor = "pointer";
-          map.setPaintProperty("projects-circles", "circle-radius", 11);
+          map.setPaintProperty("projects-circles", "circle-radius", 14);
         });
         map.on("mouseleave", "projects-circles", () => {
           map.getCanvas().style.cursor = "";
