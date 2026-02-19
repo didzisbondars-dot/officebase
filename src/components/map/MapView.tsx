@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { Project } from "@/types";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
@@ -10,30 +10,25 @@ import { X, ExternalLink } from "lucide-react";
 interface MapViewProps {
   projects: Project[];
   className?: string;
-  selectedId?: string;
   onProjectSelect?: (project: Project | null) => void;
 }
 
-export function MapView({ projects, className, selectedId, onProjectSelect }: MapViewProps) {
+export function MapView({ projects, className, onProjectSelect }: MapViewProps) {
   const mapContainer = useRef<HTMLDivElement>(null);
   const mapRef = useRef<any>(null);
-  const markersRef = useRef<any[]>([]);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [mapLoaded, setMapLoaded] = useState(false);
-  const projectsRef = useRef<Project[]>(projects);
 
-  const handleSelect = useCallback((project: Project | null) => {
-    setSelectedProject(project);
-    onProjectSelect?.(project);
-  }, [onProjectSelect]);
-
-  // Initialize map ONCE only
   useEffect(() => {
     if (!mapContainer.current || mapRef.current) return;
     const token = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
     if (!token) return;
 
+    const validProjects = projects.filter((p) => p.latitude !== 0 && p.longitude !== 0);
+    if (!validProjects.length) return;
+
     import("mapbox-gl").then(({ default: mapboxgl }) => {
+      if (mapRef.current) return; // prevent double init
       mapboxgl.accessToken = token;
 
       const map = new mapboxgl.Map({
@@ -48,47 +43,46 @@ export function MapView({ projects, className, selectedId, onProjectSelect }: Ma
       map.on("load", () => {
         setMapLoaded(true);
 
-        // Add markers once map is loaded
-        const validProjects = projectsRef.current.filter((p) => p.latitude !== 0 && p.longitude !== 0);
         validProjects.forEach((project) => {
           const color = project.propertyType.includes("A") ? "#c8882a" :
                         project.propertyType.includes("B") ? "#0f1f3d" : "#6b7280";
 
           const el = document.createElement("div");
-          el.style.cssText = `width:12px;height:12px;border-radius:50%;background:${color};border:2px solid white;box-shadow:0 2px 6px rgba(0,0,0,0.4);cursor:pointer;transition:transform 0.15s;`;
+          el.style.width = "12px";
+          el.style.height = "12px";
+          el.style.borderRadius = "50%";
+          el.style.background = color;
+          el.style.border = "2.5px solid white";
+          el.style.boxShadow = "0 2px 6px rgba(0,0,0,0.4)";
+          el.style.cursor = "pointer";
+          el.style.transition = "transform 0.15s";
+
           el.addEventListener("mouseenter", () => { el.style.transform = "scale(1.8)"; });
           el.addEventListener("mouseleave", () => { el.style.transform = "scale(1)"; });
-          el.addEventListener("click", () => handleSelect(project));
+          el.addEventListener("click", () => {
+            setSelectedProject(project);
+            onProjectSelect?.(project);
+          });
 
-          const marker = new mapboxgl.Marker({ element: el, anchor: "center" })
+          new mapboxgl.Marker({ element: el, anchor: "center" })
             .setLngLat([project.longitude, project.latitude])
             .addTo(map);
-
-          markersRef.current.push(marker);
         });
       });
     });
 
     return () => {
-      markersRef.current.forEach(m => m.remove());
-      markersRef.current = [];
-      if (mapRef.current) { mapRef.current.remove(); mapRef.current = null; }
+      if (mapRef.current) {
+        mapRef.current.remove();
+        mapRef.current = null;
+      }
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // Empty deps - init once only
-
-  useEffect(() => {
-    if (!mapRef.current || !selectedId) return;
-    const project = projects.find((p) => p.id === selectedId);
-    if (project?.latitude && project?.longitude) {
-      mapRef.current.flyTo({ center: [project.longitude, project.latitude], zoom: 16, duration: 1000 });
-      setSelectedProject(project);
-    }
-  }, [selectedId, projects]);
+  }, [projects.length]); // only re-run if number of projects changes
 
   return (
     <div className={cn("relative rounded-2xl overflow-hidden border border-border", className)}>
-      <div ref={mapContainer} className="w-full h-full min-h-[500px]" />
+      <div ref={mapContainer} className="w-full h-full min-h-[600px]" />
 
       {!mapLoaded && (
         <div className="absolute inset-0 bg-muted flex items-center justify-center">
@@ -113,8 +107,11 @@ export function MapView({ projects, className, selectedId, onProjectSelect }: Ma
       )}
 
       {selectedProject && (
-        <div className="absolute bottom-4 left-4 right-4 md:left-auto md:right-4 md:w-72 bg-white rounded-xl shadow-2xl border border-border overflow-hidden">
-          <button onClick={() => handleSelect(null)} className="absolute top-2 right-2 z-10 w-6 h-6 bg-black/20 hover:bg-black/40 rounded-full flex items-center justify-center transition-colors">
+        <div className="absolute bottom-4 right-4 w-72 bg-white rounded-xl shadow-2xl border border-border overflow-hidden">
+          <button
+            onClick={() => { setSelectedProject(null); onProjectSelect?.(null); }}
+            className="absolute top-2 right-2 z-10 w-6 h-6 bg-black/20 hover:bg-black/40 rounded-full flex items-center justify-center transition-colors"
+          >
             <X className="w-3.5 h-3.5 text-white" />
           </button>
           {selectedProject.images[0] && (
@@ -127,7 +124,10 @@ export function MapView({ projects, className, selectedId, onProjectSelect }: Ma
             <span className="text-xs font-medium text-[var(--brand-gold)]">{selectedProject.propertyType}</span>
             <h3 className="font-display text-base text-foreground mb-0.5">{selectedProject.name}</h3>
             <p className="text-xs text-muted-foreground mb-3">{selectedProject.address}</p>
-            <Link href={`/projects/${selectedProject.slug}`} className="flex items-center justify-center gap-1.5 w-full text-xs font-medium bg-[var(--brand-navy)] text-white py-2 rounded-lg hover:bg-[var(--brand-navy)]/90 transition-colors">
+            <Link
+              href={`/projects/${selectedProject.slug}`}
+              className="flex items-center justify-center gap-1.5 w-full text-xs font-medium bg-[var(--brand-navy)] text-white py-2 rounded-lg hover:bg-opacity-90 transition-colors"
+            >
               View Details <ExternalLink className="w-3 h-3" />
             </Link>
           </div>
