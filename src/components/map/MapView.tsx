@@ -22,7 +22,7 @@ export function MapView({ projects, className, onProjectSelect }: MapViewProps) 
   const initialized = useRef(false);
 
   useEffect(() => {
-    if (initialized.current || !mapContainer.current) return;
+    if (!projects.length || initialized.current || !mapContainer.current) return;
     const token = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
     if (!token) return;
 
@@ -74,7 +74,7 @@ export function MapView({ projects, className, onProjectSelect }: MapViewProps) 
       initialized.current = false;
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [projects.length]);
 
   return (
     <div className={cn("relative rounded-2xl overflow-hidden border border-border", className)}>
