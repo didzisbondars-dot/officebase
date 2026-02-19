@@ -20,12 +20,14 @@ export function MapView({ projects, className, selectedId, onProjectSelect }: Ma
   const markersRef = useRef<any[]>([]);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [mapLoaded, setMapLoaded] = useState(false);
+  const projectsRef = useRef<Project[]>(projects);
 
   const handleSelect = useCallback((project: Project | null) => {
     setSelectedProject(project);
     onProjectSelect?.(project);
   }, [onProjectSelect]);
 
+  // Initialize map ONCE only
   useEffect(() => {
     if (!mapContainer.current || mapRef.current) return;
     const token = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
@@ -46,39 +48,22 @@ export function MapView({ projects, className, selectedId, onProjectSelect }: Ma
       map.on("load", () => {
         setMapLoaded(true);
 
-        const validProjects = projects.filter((p) => p.latitude !== 0 && p.longitude !== 0);
-        
+        // Add markers once map is loaded
+        const validProjects = projectsRef.current.filter((p) => p.latitude !== 0 && p.longitude !== 0);
         validProjects.forEach((project) => {
-          const color =
-            project.propertyType.includes("A") ? "#c8882a" :
-            project.propertyType.includes("B") ? "#0f1f3d" : "#6b7280";
+          const color = project.propertyType.includes("A") ? "#c8882a" :
+                        project.propertyType.includes("B") ? "#0f1f3d" : "#6b7280";
 
           const el = document.createElement("div");
-          el.style.cssText = `
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            background: ${color};
-            border: 2px solid white;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.4);
-            cursor: pointer;
-            transition: transform 0.15s, box-shadow 0.15s;
-          `;
-
-          el.addEventListener("mouseenter", () => {
-            el.style.transform = "scale(1.8)";
-            el.style.boxShadow = "0 4px 12px rgba(0,0,0,0.5)";
-          });
-          el.addEventListener("mouseleave", () => {
-            el.style.transform = "scale(1)";
-            el.style.boxShadow = "0 2px 6px rgba(0,0,0,0.4)";
-          });
+          el.style.cssText = `width:12px;height:12px;border-radius:50%;background:${color};border:2px solid white;box-shadow:0 2px 6px rgba(0,0,0,0.4);cursor:pointer;transition:transform 0.15s;`;
+          el.addEventListener("mouseenter", () => { el.style.transform = "scale(1.8)"; });
+          el.addEventListener("mouseleave", () => { el.style.transform = "scale(1)"; });
           el.addEventListener("click", () => handleSelect(project));
 
-          const marker = new mapboxgl.Marker({ element: el })
+          const marker = new mapboxgl.Marker({ element: el, anchor: "center" })
             .setLngLat([project.longitude, project.latitude])
             .addTo(map);
-          
+
           markersRef.current.push(marker);
         });
       });
@@ -89,7 +74,8 @@ export function MapView({ projects, className, selectedId, onProjectSelect }: Ma
       markersRef.current = [];
       if (mapRef.current) { mapRef.current.remove(); mapRef.current = null; }
     };
-  }, [projects, handleSelect]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Empty deps - init once only
 
   useEffect(() => {
     if (!mapRef.current || !selectedId) return;
@@ -112,7 +98,7 @@ export function MapView({ projects, className, selectedId, onProjectSelect }: Ma
 
       {mapLoaded && (
         <div className="absolute top-3 left-3 bg-white rounded-xl shadow-md border border-border p-3 text-xs space-y-1.5">
-          <p className="font-semibold text-foreground mb-2">Building Class</p>
+          <p className="font-semibold text-foreground mb-1">Building Class</p>
           {[
             { color: "#c8882a", label: "Class A" },
             { color: "#0f1f3d", label: "Class B" },
