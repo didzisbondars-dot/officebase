@@ -157,3 +157,17 @@
 ::-webkit-scrollbar-thumb:hover {
   background: hsl(var(--muted-foreground));
 }
+
+/* Fix for stretched Mapbox popups and project names */
+.mapboxgl-popup-content {
+    max-width: 250px !important;
+    min-width: 150px !important;
+}
+
+.mapboxgl-popup-content h3, 
+.mapboxgl-popup-content div {
+    white-space: normal !important;
+    word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
+    display: block !important;
+}
