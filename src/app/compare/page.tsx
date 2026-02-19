@@ -11,15 +11,21 @@ export default function ComparePage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Reverting to the original key 'compare'
     const saved = localStorage.getItem("compare");
     if (saved) {
-      const ids = JSON.parse(saved);
-      if (ids.length > 0) {
-        getProjectsByIds(ids)
-          .then(setProjects)
-          .finally(() => setLoading(false));
-      } else {
+      try {
+        const ids = JSON.parse(saved);
+        if (Array.isArray(ids) && ids.length > 0) {
+          getProjectsByIds(ids)
+            .then(data => {
+              if (data) setProjects(data);
+            })
+            .catch(err => console.error("Fetch error:", err))
+            .finally(() => setLoading(false));
+        } else {
+          setLoading(false);
+        }
+      } catch (e) {
         setLoading(false);
       }
     } else {
@@ -33,12 +39,14 @@ export default function ComparePage() {
     localStorage.setItem("compare", JSON.stringify(newProjects.map(p => p.id)));
   };
 
-  if (loading) return <div className="min-h-screen pt-24 flex items-center justify-center">Loading comparison...</div>;
+  if (loading) return <div className="min-h-screen pt-24 flex items-center justify-center font-medium">Loading comparison...</div>;
 
-  if (!projects.length) return (
+  if (!projects || projects.length === 0) return (
     <div className="min-h-screen pt-24 flex flex-col items-center justify-center gap-4">
-      <p className="text-muted-foreground">No projects selected.</p>
-      <Link href="/projects" className="text-sm text-[var(--brand-navy)] hover:underline">← Back to Projects</Link>
+      <p className="text-muted-foreground text-lg">No projects selected for comparison.</p>
+      <Link href="/projects" className="px-6 py-2 bg-[var(--brand-navy)] text-white rounded-lg hover:opacity-90 transition-opacity">
+        Back to Projects
+      </Link>
     </div>
   );
 
@@ -49,37 +57,45 @@ export default function ComparePage() {
           <Link href="/projects" className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground">
             <ArrowLeft className="w-4 h-4" />Back
           </Link>
-          <h1 className="text-3xl font-bold">Compare Projects</h1>
+          <h1 className="text-3xl font-bold">Compare ({projects.length}/3)</h1>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {projects.map((project) => (
-            <div key={project.id} className="bg-white rounded-xl shadow-sm border overflow-hidden relative">
+            <div key={project.id} className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden relative flex flex-col">
               <button 
                 onClick={() => removeItem(project.id)}
-                className="absolute top-2 right-2 p-1 bg-white/80 rounded-full hover:bg-white z-10"
+                className="absolute top-3 right-3 p-1.5 bg-white/90 rounded-full hover:bg-white z-10 shadow-sm border border-slate-100"
               >
                 <X className="w-4 h-4" />
               </button>
-              <div className="aspect-video relative overflow-hidden">
-                {project.images?.[0] && (
-                  <img src={project.images[0].url} alt={project.name} className="object-cover w-full h-full" />
+              
+              <div className="aspect-[4/3] relative overflow-hidden bg-slate-100">
+                {project.images?.[0]?.url ? (
+                  <img src={project.images[0].url} alt={project.name || "Project"} className="object-cover w-full h-full" />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-slate-400 italic">No Image</div>
                 )}
               </div>
-              <div className="p-6 space-y-4">
-                <h3 className="font-bold text-xl">{project.name}</h3>
-                <div className="space-y-2 text-sm border-t pt-4">
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Status</span>
-                    <span className="font-medium">{project.status}</span>
+
+              <div className="p-6 flex-grow flex flex-col">
+                <div className="mb-6">
+                  <h3 className="font-bold text-xl leading-tight mb-1">{project.name || "Unnamed Project"}</h3>
+                  <p className="text-sm text-muted-foreground">{project.developer || "Developer N/A"}</p>
+                </div>
+                
+                <div className="space-y-4 text-sm border-t border-slate-100 pt-6 mt-auto">
+                  <div className="flex flex-col">
+                    <span className="text-[10px] uppercase tracking-wider text-slate-400 font-semibold">Status</span>
+                    <span className="font-medium mt-0.5 text-slate-900">{project.status || "N/A"}</span>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">District</span>
-                    <span className="font-medium">{project.district}</span>
+                  <div className="flex flex-col">
+                    <span className="text-[10px] uppercase tracking-wider text-slate-400 font-semibold">District</span>
+                    <span className="font-medium mt-0.5 text-slate-900">{project.district || "N/A"}</span>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Area</span>
-                    <span className="font-medium">{project.totalArea} m²</span>
+                  <div className="flex flex-col">
+                    <span className="text-[10px] uppercase tracking-wider text-slate-400 font-semibold">Total Area</span>
+                    <span className="font-medium mt-0.5 text-slate-900">{project.totalArea ? `${project.totalArea} m²` : "Contact for details"}</span>
                   </div>
                 </div>
               </div>
