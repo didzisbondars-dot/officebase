@@ -145,28 +145,53 @@ export function MapView({ projects, className, onProjectSelect }: MapViewProps) 
       )}
 
       {selectedProject && (
-        <div className="absolute bottom-4 right-4 w-72 bg-white rounded-xl shadow-2xl border border-border overflow-hidden">
+        <div className="absolute bottom-4 left-4 w-80 bg-white rounded-2xl shadow-2xl border border-border overflow-hidden">
           <button
             onClick={() => { setSelectedProject(null); onProjectSelect?.(null); }}
-            className="absolute top-2 right-2 z-10 w-6 h-6 bg-black/20 hover:bg-black/40 rounded-full flex items-center justify-center"
+            className="absolute top-3 right-3 z-10 w-7 h-7 bg-black/30 hover:bg-black/50 rounded-full flex items-center justify-center transition-colors"
           >
-            <X className="w-3.5 h-3.5 text-white" />
+            <X className="w-4 h-4 text-white" />
           </button>
-          {selectedProject.images[0] && (
-            <div className="relative h-36">
+          <div className="relative h-48">
+            {selectedProject.images[0] ? (
               <Image src={selectedProject.images[0].url} alt={selectedProject.name} fill className="object-cover" />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+            ) : (
+              <div className="w-full h-full bg-muted flex items-center justify-center">
+                <span className="font-display text-4xl text-muted-foreground/30">{selectedProject.name.charAt(0)}</span>
+              </div>
+            )}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+            <div className="absolute bottom-3 left-3">
+              <span className="text-xs font-semibold text-white bg-[var(--brand-gold)] px-2.5 py-1 rounded-full">{selectedProject.propertyType}</span>
             </div>
-          )}
-          <div className="p-3">
-            <span className="text-xs font-medium text-[var(--brand-gold)]">{selectedProject.propertyType}</span>
-            <h3 className="font-display text-base mb-0.5">{selectedProject.name}</h3>
-            <p className="text-xs text-muted-foreground mb-3">{selectedProject.address}</p>
+          </div>
+          <div className="p-4 space-y-3">
+            <h3 className="font-display text-xl text-[var(--brand-navy)] leading-tight">{selectedProject.name}</h3>
+            <div className="space-y-1.5">
+              {selectedProject.address && (
+                <div className="flex items-start gap-2 text-sm text-muted-foreground">
+                  <span className="shrink-0 mt-0.5">📍</span>
+                  <span>{selectedProject.address}, {selectedProject.district}</span>
+                </div>
+              )}
+              {selectedProject.totalArea > 0 && (
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <span>📐</span>
+                  <span>{selectedProject.totalArea.toLocaleString()} sqm total area</span>
+                </div>
+              )}
+              {selectedProject.minUnitSize > 0 && (
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <span>🏢</span>
+                  <span>{selectedProject.minUnitSize.toLocaleString()} sqm GLA</span>
+                </div>
+              )}
+            </div>
             <Link
               href={`/projects/${selectedProject.slug}`}
-              className="flex items-center justify-center gap-1.5 w-full text-xs font-medium bg-[var(--brand-navy)] text-white py-2 rounded-lg"
+              className="flex items-center justify-center gap-1.5 w-full text-sm font-medium bg-[var(--brand-navy)] text-white py-2.5 rounded-xl hover:bg-[var(--brand-navy)]/90 transition-colors"
             >
-              View Details <ExternalLink className="w-3 h-3" />
+              View Full Details <ExternalLink className="w-3.5 h-3.5" />
             </Link>
           </div>
         </div>
