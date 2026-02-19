@@ -66,7 +66,7 @@ export async function getProjects(filters?: SearchFilters): Promise<Project[]> {
   if (filters?.maxArea) filterFormulas.push(`{GBA} <= ${filters.maxArea}`);
   const formula = filterFormulas.length > 1 ? `AND(${filterFormulas.join(", ")})` : filterFormulas.length === 1 ? filterFormulas[0] : "";
   const records = await base(PROJECTS_TABLE).select({
-    filterByFormula: formula || undefined,
+    
     sort: [{ field: "Project name", direction: "asc" }],
   }).all();
   let projects = records.map(transformRecord);
