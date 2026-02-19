@@ -16,7 +16,7 @@ export function CompareBar() {
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2 text-sm font-medium text-white/80 shrink-0">
             <GitCompareArrows className="w-4 h-4" />
-            Compare ({compareList.length}/5)
+            Compare ({compareList.length}/3)
           </div>
           <div className="flex items-center gap-3 flex-1 overflow-x-auto">
             {compareList.map((project) => (
@@ -29,7 +29,7 @@ export function CompareBar() {
             ))}
             {compareList.length < 3 && Array.from({ length: 3 - compareList.length }).map((_, i) => (
               <div key={i} className="border border-dashed border-white/20 rounded-lg px-3 py-1.5 shrink-0">
-                <span className="text-sm text-white/50 whitespace-nowrap">Add project...</span>
+                <span className="text-sm text-white/30 whitespace-nowrap">Add project...</span>
               </div>
             ))}
           </div>
