@@ -192,3 +192,22 @@
     display: block !important;
     width: 100% !important;
 }
+
+/* 1. Force the outer container to stay narrow */
+.mapboxgl-popup {
+    max-width: 240px !important;
+}
+
+/* 2. Force the content box to wrap text */
+.mapboxgl-popup-content {
+    width: 240px !important;
+    white-space: normal !important;
+    word-break: break-word !important;
+    overflow-wrap: anywhere !important;
+}
+
+/* 3. Target the specific header inside the popup */
+.mapboxgl-popup-content h3 {
+    width: 100% !important;
+    display: block !important;
+}
