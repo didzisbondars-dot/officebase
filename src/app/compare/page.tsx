@@ -1,108 +1,113 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from "react";
+import { Suspense, useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import Image from "next/image";
 import Link from "next/link";
-import { ArrowLeft, X } from "lucide-react";
-import { getCompareProjects } from "./actions";
+import { ArrowLeft, MapPin, CheckCircle2, XCircle } from "lucide-react";
+import type { Project } from "@/types";
+import { formatArea, getStatusColor, getStatusDot, cn } from "@/lib/utils";
+import { CompareProvider } from "@/components/compare/CompareContext";
 
-export default function ComparePage() {
-  const [projects, setProjects] = useState<any[]>([]);
+function CompareContent() {
+  const searchParams = useSearchParams();
+  const idsParam = searchParams.get("ids");
+  const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const saved = localStorage.getItem("compare");
-    if (saved) {
-      try {
-        const ids = JSON.parse(saved);
-        if (Array.isArray(ids) && ids.length > 0) {
-          // Calls our new secure Server Action
-          getCompareProjects(ids)
-            .then(data => {
-              if (data) setProjects(data);
-            })
-            .catch(err => console.error("Action error:", err))
-            .catch(err => console.error("Compare fetch error:", err)).finally(() => setLoading(false));
-        } else {
-          setLoading(false);
-        }
-      } catch (e) {
-        setLoading(false);
-      }
-    } else {
-      setLoading(false);
-    }
-  }, []);
+    if (!idsParam) { setLoading(false); return; }
+    const ids = idsParam.split(",").filter(Boolean);
+    fetch("/api/projects")
+      .then((r) => r.json())
+      .then((data) => {
+        const all: Project[] = data.data || [];
+        setProjects(ids.map((id) => all.find((p) => p.id === id)).filter(Boolean) as Project[]);
+      })
+      .finally(() => setLoading(false));
+  }, [idsParam]);
 
-  const removeItem = (id: string) => {
-    const newProjects = projects.filter(p => p.id !== id);
-    setProjects(newProjects);
-    localStorage.setItem("compare", JSON.stringify(newProjects.map(p => p.id)));
-  };
+  const cols = `200px repeat(${projects.length}, 1fr)`;
+  const allAmenities = [...new Set(projects.flatMap((p) => p.amenities))].sort();
+  const allCerts = [...new Set(projects.flatMap((p) => p.certifications))].sort();
 
-  if (loading) return <div className="min-h-screen pt-24 flex items-center justify-center font-medium">Loading comparison...</div>;
-
-  if (!projects || projects.length === 0) return (
+  if (loading) return <div className="min-h-screen pt-24 flex items-center justify-center"><p className="text-muted-foreground">Loading...</p></div>;
+  if (!projects.length) return (
     <div className="min-h-screen pt-24 flex flex-col items-center justify-center gap-4">
-      <p className="text-slate-500 text-lg">No projects selected for comparison.</p>
-      <Link href="/projects" className="px-6 py-2 bg-[#1B2B44] text-white rounded-lg hover:opacity-90 transition-opacity">
-        Back to Projects
-      </Link>
+      <p className="text-muted-foreground">No projects selected for comparison.</p>
+      <Link href="/projects" className="px-5 py-2 bg-[var(--brand-navy)] text-white rounded-lg text-sm">Back to Projects</Link>
     </div>
   );
 
   return (
-    <div className="min-h-screen bg-[#FDFCFB] pt-20">
+    <div className="min-h-screen bg-[var(--brand-warm)] pt-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex items-center gap-4 mb-8">
-          <Link href="/projects" className="flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-900">
-            <ArrowLeft className="w-4 h-4" />Back
+          <Link href="/projects" className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground">
+            <ArrowLeft className="w-4 h-4" />Back to Projects
           </Link>
-          <h1 className="text-3xl font-bold text-[#1B2B44]">Compare ({projects.length}/3)</h1>
+          <h1 className="font-display text-3xl text-[var(--brand-navy)]">Compare Projects</h1>
         </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {projects.map((project) => (
-            <div key={project.id} className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden relative flex flex-col">
-              <button 
-                onClick={() => removeItem(project.id)}
-                className="absolute top-3 right-3 p-1.5 bg-white/90 rounded-full hover:bg-white z-10 shadow-sm border border-slate-100"
-              >
-                <X className="w-4 h-4" />
-              </button>
-              
-              <div className="aspect-[4/3] relative overflow-hidden bg-slate-100">
-                {project.images?.[0]?.url ? (
-                  <img src={project.images[0].url} alt={project.name || "Project"} className="object-cover w-full h-full" />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center text-slate-400 italic">No Image</div>
-                )}
-              </div>
-
-              <div className="p-6 flex-grow flex flex-col">
-                <div className="mb-6">
-                  <h3 className="font-bold text-xl leading-tight mb-1 text-[#1B2B44]">{project.name || "Unnamed Project"}</h3>
-                  <p className="text-sm text-slate-500">{project.developer || "Developer N/A"}</p>
+        <div className="bg-white rounded-2xl border border-border overflow-hidden">
+          <div className="grid border-b border-border" style={{ gridTemplateColumns: cols }}>
+            <div className="p-5 bg-muted/40" />
+            {projects.map((p) => (
+              <div key={p.id} className="p-5 border-l border-border">
+                <div className="relative h-32 rounded-xl overflow-hidden mb-3 bg-muted">
+                  {p.images[0] && <Image src={p.images[0].url} alt={p.name} fill className="object-cover" />}
                 </div>
-                
-                <div className="space-y-4 text-sm border-t border-slate-100 pt-6 mt-auto">
-                  <div className="flex flex-col">
-                    <span className="text-[10px] uppercase tracking-wider text-slate-400 font-semibold">Status</span>
-                    <span className="font-medium mt-0.5 text-slate-900">{project.status || "N/A"}</span>
-                  </div>
-                  <div className="flex flex-col">
-                    <span className="text-[10px] uppercase tracking-wider text-slate-400 font-semibold">District</span>
-                    <span className="font-medium mt-0.5 text-slate-900">{project.district || "N/A"}</span>
-                  </div>
-                  <div className="flex flex-col">
-                    <span className="text-[10px] uppercase tracking-wider text-slate-400 font-semibold">Total Area</span>
-                    <span className="font-medium mt-0.5 text-slate-900">{project.totalArea ? `${project.totalArea} m²` : "Contact for details"}</span>
-                  </div>
-                </div>
+                <span className={cn("inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full border mb-1", getStatusColor(p.status))}>
+                  <span className={cn("w-1.5 h-1.5 rounded-full", getStatusDot(p.status))} />{p.status}
+                </span>
+                <h3 className="font-display text-lg">{p.name}</h3>
+                <p className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5"><MapPin className="w-3 h-3" />{p.district}, {p.city}</p>
+                <Link href={`/projects/${p.slug}`} className="text-xs text-[var(--brand-navy)] hover:underline mt-1 block">View →</Link>
               </div>
+            ))}
+          </div>
+          {[
+            { label: "Property Type", fn: (p: Project) => p.propertyType },
+            { label: "Total Area", fn: (p: Project) => p.totalArea ? formatArea(p.totalArea) : "—" },
+            { label: "GLA", fn: (p: Project) => p.minUnitSize ? formatArea(p.minUnitSize) : "—" },
+            { label: "Owner/Developer", fn: (p: Project) => p.developer || "—" },
+            { label: "District", fn: (p: Project) => p.district || "—" },
+            { label: "Address", fn: (p: Project) => p.address || "—" },
+          ].map((row) => (
+            <div key={row.label} className="grid border-b border-border hover:bg-muted/20" style={{ gridTemplateColumns: cols }}>
+              <div className="p-4 text-sm font-medium text-muted-foreground bg-muted/20">{row.label}</div>
+              {projects.map((p) => <div key={p.id} className="p-4 border-l border-border text-sm">{row.fn(p)}</div>)}
             </div>
           ))}
+          {allAmenities.length > 0 && <>
+            <div className="grid bg-muted/40 border-b border-border" style={{ gridTemplateColumns: cols }}><div className="p-4 font-semibold text-sm col-span-full">Amenities</div></div>
+            {allAmenities.map((a) => (
+              <div key={a} className="grid border-b border-border hover:bg-muted/20" style={{ gridTemplateColumns: cols }}>
+                <div className="p-4 text-sm text-muted-foreground bg-muted/20">{a}</div>
+                {projects.map((p) => <div key={p.id} className="p-4 border-l border-border">{p.amenities.includes(a) ? <CheckCircle2 className="w-4 h-4 text-emerald-500" /> : <XCircle className="w-4 h-4 text-muted-foreground/30" />}</div>)}
+              </div>
+            ))}
+          </>}
+          {allCerts.length > 0 && <>
+            <div className="grid bg-muted/40 border-b border-border" style={{ gridTemplateColumns: cols }}><div className="p-4 font-semibold text-sm col-span-full">Certifications</div></div>
+            {allCerts.map((c) => (
+              <div key={c} className="grid border-b border-border hover:bg-muted/20" style={{ gridTemplateColumns: cols }}>
+                <div className="p-4 text-sm text-muted-foreground bg-muted/20">{c}</div>
+                {projects.map((p) => <div key={p.id} className="p-4 border-l border-border">{p.certifications.includes(c) ? <CheckCircle2 className="w-4 h-4 text-emerald-500" /> : <XCircle className="w-4 h-4 text-muted-foreground/30" />}</div>)}
+              </div>
+            ))}
+          </>}
         </div>
       </div>
     </div>
+  );
+}
+
+export default function ComparePage() {
+  return (
+    <CompareProvider>
+      <Suspense fallback={<div className="min-h-screen pt-24 flex items-center justify-center"><p className="text-muted-foreground">Loading...</p></div>}>
+        <CompareContent />
+      </Suspense>
+    </CompareProvider>
   );
 }
