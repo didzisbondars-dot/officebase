@@ -21,7 +21,7 @@ export default function ComparePage() {
               if (data) setProjects(data);
             })
             .catch(err => console.error("Action error:", err))
-            .finally(() => setLoading(false));
+            .catch(err => console.error("Compare fetch error:", err)).finally(() => setLoading(false));
         } else {
           setLoading(false);
         }
