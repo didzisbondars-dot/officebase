@@ -10,6 +10,7 @@ import { X, ExternalLink } from "lucide-react";
 interface MapViewProps {
   projects: Project[];
   className?: string;
+  selectedId?: string;
   onProjectSelect?: (project: Project | null) => void;
 }
 
