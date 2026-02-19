@@ -27,6 +27,7 @@ export function SearchFiltersPanel({
   const [selectedStatus, setSelectedStatus] = useState<string[]>([]);
   const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
   const [showAdvanced, setShowAdvanced] = useState(false);
+  const [district, setDistrict] = useState("");
   const [minArea, setMinArea] = useState("");
   const [rentRange, setRentRange] = useState<[number, number]>([0, 30]);
   const [maxArea, setMaxArea] = useState("");
@@ -116,16 +117,21 @@ export function SearchFiltersPanel({
         {cities.length > 0 && (
           <div className="relative">
             <select
-              value={city}
+              value={district}
               onChange={(e) => {
-                setCity(e.target.value);
-                applyFilters({ city: e.target.value || undefined });
+                setDistrict(e.target.value);
+                onFiltersChange({
+                  query: query || undefined,
+                  district: e.target.value || undefined,
+                  status: selectedStatus.length ? selectedStatus : undefined,
+                  propertyType: selectedTypes.length ? selectedTypes : undefined,
+                });
               }}
               className="appearance-none pl-3 pr-8 py-2 text-sm border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--brand-navy)]/20 focus:border-[var(--brand-navy)] bg-white transition-all cursor-pointer"
             >
-              <option value="">All Cities</option>
-              {cities.map((c) => (
-                <option key={c} value={c}>{c}</option>
+              <option value="">All Areas</option>
+              {["Centrs", "Labais krasts", "Pārdaugava", "Skanste", "Vecrīga"].map((area) => (
+                <option key={area} value={area}>{area}</option>
               ))}
             </select>
             <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground pointer-events-none" />
