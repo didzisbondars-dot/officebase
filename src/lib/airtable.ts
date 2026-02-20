@@ -26,7 +26,7 @@ function transformRecord(record: any): Project {
     developer: fields["Owner"] || fields["Developer"] || "",
     developerLogo: undefined,
     status: fields["Status"] || "Available",
-    propertyType: fields["Building class"] || fields["Property Type"] || "Grade B Office",
+    propertyType: fields["Building class"] || fields["Property Type"] || "B",
     address: fields["Adress"] || fields["Address"] || "",
     city: "Riga",
     district: fields["City Area"] || fields["District"] || "",

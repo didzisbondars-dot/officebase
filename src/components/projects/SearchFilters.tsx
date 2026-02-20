@@ -157,18 +157,22 @@ export function SearchFiltersPanel({
 
       {/* Property type */}
       <div className="flex flex-wrap gap-2 mb-4">
-        {PROPERTY_TYPE_OPTIONS.map((type) => (
+        {[
+            { value: "A", label: "Grade A" },
+            { value: "B", label: "Grade B" },
+            { value: "B/C", label: "Grade B/C" },
+          ].map(({ value, label }) => (
           <button
-            key={type}
-            onClick={() => toggleType(type)}
+            key={value}
+            onClick={() => toggleType(value)}
             className={cn(
               "px-3 py-2 text-sm rounded-lg border transition-all",
-              selectedTypes.includes(type)
+              selectedTypes.includes(value)
                 ? "bg-[var(--brand-gold)] text-white border-[var(--brand-gold)]"
                 : "bg-white text-foreground/70 border-border hover:border-[var(--brand-gold)]/40"
             )}
           >
-            {type}
+            {label}
           </button>
         ))}
       </div>

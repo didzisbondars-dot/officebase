@@ -6,7 +6,7 @@ export interface Project {
   developer: string;
   developerLogo?: string;
   status: "Available" | "Under Construction" | "Sold Out" | "Coming Soon";
-  propertyType: "Grade A Office" | "Co-working" | "Mixed Use" | "Grade B Office";
+  propertyType: string;
   address: string;
   city: string;
   district: string;
@@ -109,9 +109,4 @@ export const STATUS_OPTIONS = [
   "Planing stage",
 ] as const;
 
-export const PROPERTY_TYPE_OPTIONS = [
-  "Grade A Office",
-  "Grade B Office",
-  "Co-working",
-  "Mixed Use",
-] as const;
+export const PROPERTY_TYPE_OPTIONS = ["A", "B", "B/C"] as const;
