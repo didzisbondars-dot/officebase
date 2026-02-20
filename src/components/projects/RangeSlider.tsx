@@ -68,7 +68,11 @@ export function RangeSlider({ min, max, values, onChange, ticks }: RangeSliderPr
   return (
     <div className="w-full select-none">
       <div ref={trackRef} className="relative h-6 flex items-center">
+        {/* Full track grey */}
         <div className="absolute w-full h-1.5 bg-border rounded-full" />
+        {/* Hide grey to the left of min handle */}
+        <div className="absolute h-1.5 bg-white rounded-full" style={{ left: 0, width: `${getPercent(values[0])}%` }} />
+        {/* Active navy range */}
         <div
           className="absolute h-1.5 bg-[var(--brand-navy)] rounded-full pointer-events-none"
           style={{ left: `${getPercent(values[0])}%`, right: `${100 - getPercent(values[1])}%` }}
