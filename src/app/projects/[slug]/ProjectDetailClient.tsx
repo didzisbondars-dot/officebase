@@ -75,8 +75,6 @@ export default function ProjectDetailClient({ project }: { project: Project }) {
           </div>
         </div>
       </div>
-
-      </div>
       </div>
       </div>
 
