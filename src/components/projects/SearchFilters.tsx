@@ -31,6 +31,8 @@ export function SearchFiltersPanel({
   const [district, setDistrict] = useState("");
   const [minArea, setMinArea] = useState("");
   const [rentRange, setRentRange] = useState<[number, number]>([5, 20]);
+  const [areaRange, setAreaRange] = useState<[number, number]>([0, 5000]);
+  const [areaRange, setAreaRange] = useState<[number, number]>([0, 5000]);
   const [maxArea, setMaxArea] = useState("");
 
   const applyFilters = useCallback(
@@ -96,7 +98,7 @@ export function SearchFiltersPanel({
   };
 
   const hasFilters =
-    query || city || selectedStatus.length || selectedTypes.length || minArea || maxArea || rentRange[0] > 5 || rentRange[1] < 20;
+    query || city || selectedStatus.length || selectedTypes.length || minArea || maxArea || rentRange[0] > 5 || rentRange[1] < 20 || areaRange[0] > 0 || areaRange[1] < 5000;
 
   return (
     <div className={cn("bg-white rounded-2xl border border-border p-5", className)}>
@@ -200,6 +202,8 @@ export function SearchFiltersPanel({
         />
       </div>
 
+      </div>
+      </div>
       {/* Advanced filters */}
       <button
         onClick={() => setShowAdvanced(!showAdvanced)}

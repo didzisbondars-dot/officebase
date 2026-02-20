@@ -16,6 +16,7 @@ export interface Project {
   minUnitSize: number; // sqm
   maxUnitSize: number; // sqm
   salePricePerSqm?: number;
+  availableArea: number;
   rentPricePerSqm?: number;
   floors: number;
   completionDate?: string;
@@ -60,6 +61,10 @@ export interface SearchFilters {
   minArea?: number;
   maxArea?: number;
   minRent?: number;
+  minArea?: number;
+  maxArea?: number;
+  minAvailableArea?: number;
+  maxAvailableArea?: number;
   maxRent?: number;
   minPrice?: number;
   maxPrice?: number;
