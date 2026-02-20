@@ -30,6 +30,11 @@ export default function ProjectsPage() {
       if (filters.propertyType) filters.propertyType.forEach((t) => params.append("type", t));
       if (filters.minArea) params.set("minArea", String(filters.minArea));
       if (filters.maxArea) params.set("maxArea", String(filters.maxArea));
+      if (filters.district) params.set("district", filters.district);
+      if (filters.minRent) params.set("minRent", String(filters.minRent));
+      if (filters.maxRent) params.set("maxRent", String(filters.maxRent));
+      if (filters.minAvailableArea) params.set("minAvailableArea", String(filters.minAvailableArea));
+      if (filters.maxAvailableArea) params.set("maxAvailableArea", String(filters.maxAvailableArea));
 
       const res = await fetch(`/api/projects?${params.toString()}`);
       const data = await res.json();

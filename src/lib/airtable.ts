@@ -71,6 +71,11 @@ export async function getProjects(filters?: SearchFilters): Promise<Project[]> {
   if (filters?.propertyType?.length) projects = projects.filter((p) => filters.propertyType!.includes(p.propertyType));
   if (filters?.minArea) projects = projects.filter((p) => p.totalArea >= filters.minArea!);
   if (filters?.maxArea) projects = projects.filter((p) => p.totalArea <= filters.maxArea!);
+  if (filters?.district) projects = projects.filter((p) => p.district?.toLowerCase() === filters.district!.toLowerCase());
+  if (filters?.minRent) projects = projects.filter((p) => p.rentPricePerSqm >= filters.minRent!);
+  if (filters?.maxRent) projects = projects.filter((p) => p.rentPricePerSqm > 0 && p.rentPricePerSqm <= filters.maxRent!);
+  if (filters?.minAvailableArea) projects = projects.filter((p) => p.availableArea >= filters.minAvailableArea!);
+  if (filters?.maxAvailableArea) projects = projects.filter((p) => p.availableArea > 0 && p.availableArea <= filters.maxAvailableArea!);
   return projects;
 }
 

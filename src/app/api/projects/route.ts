@@ -17,6 +17,10 @@ export async function GET(request: NextRequest) {
       maxArea: searchParams.get("maxArea") ? Number(searchParams.get("maxArea")) : undefined,
       minPrice: searchParams.get("minPrice") ? Number(searchParams.get("minPrice")) : undefined,
       maxPrice: searchParams.get("maxPrice") ? Number(searchParams.get("maxPrice")) : undefined,
+      minRent: searchParams.get("minRent") ? Number(searchParams.get("minRent")) : undefined,
+      maxRent: searchParams.get("maxRent") ? Number(searchParams.get("maxRent")) : undefined,
+      minAvailableArea: searchParams.get("minAvailableArea") ? Number(searchParams.get("minAvailableArea")) : undefined,
+      maxAvailableArea: searchParams.get("maxAvailableArea") ? Number(searchParams.get("maxAvailableArea")) : undefined,
     };
 
     const projects = await getProjects(filters);
