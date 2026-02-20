@@ -173,37 +173,71 @@ export function SearchFiltersPanel({
           </button>
         ))}
       </div>
-      {/* Rent rate slider */}
-      <div className="mb-6 w-1/2">
-        <div className="flex items-center justify-between mb-3">
-          <label className="text-sm font-medium text-foreground/70">Asking Rent Rate</label>
-          <span className="text-sm font-semibold text-[var(--brand-navy)]">
-            {rentRange[0] === 5 && rentRange[1] === 20
-              ? "Any price"
-              : `€${rentRange[0]} – €${rentRange[1]}/sqm`}
-          </span>
+      {/* Sliders */}
+      <div className="grid grid-cols-2 gap-8 mb-6">
+        {/* Available Area */}
+        <div>
+          <div className="flex items-center justify-between mb-3">
+            <label className="text-sm font-medium text-foreground/70">Available Area</label>
+            <span className="text-sm font-semibold text-[var(--brand-navy)]">
+              {areaRange[0] === 0 && areaRange[1] === 5000
+                ? "Any size"
+                : `${areaRange[0].toLocaleString()} – ${areaRange[1].toLocaleString()} sqm`}
+            </span>
+          </div>
+          <RangeSlider
+            min={0}
+            max={5000}
+            values={areaRange}
+            ticks={[0, 500, 1000, 2000, 3000, 5000]}
+            onChange={(next) => {
+              setAreaRange(next);
+              onFiltersChange({
+                query: query || undefined,
+                district: district || undefined,
+                status: selectedStatus.length ? selectedStatus : undefined,
+                propertyType: selectedTypes.length ? selectedTypes : undefined,
+                minRent: rentRange[0] > 5 ? rentRange[0] : undefined,
+                maxRent: rentRange[1] < 20 ? rentRange[1] : undefined,
+                minAvailableArea: next[0] > 0 ? next[0] : undefined,
+                maxAvailableArea: next[1] < 5000 ? next[1] : undefined,
+              });
+            }}
+          />
         </div>
-        <RangeSlider
-          min={5}
-          max={20}
-          values={rentRange}
-          ticks={[5, 7, 10, 12.5, 15, 20]}
-          onChange={(next) => {
-            setRentRange(next);
-            onFiltersChange({
-              query: query || undefined,
-              district: district || undefined,
-              status: selectedStatus.length ? selectedStatus : undefined,
-              propertyType: selectedTypes.length ? selectedTypes : undefined,
-              minRent: next[0] > 0 ? next[0] : undefined,
-              maxRent: next[1] < 20 ? next[1] : undefined,
-            });
-          }}
-        />
+
+        {/* Rent Rate */}
+        <div>
+          <div className="flex items-center justify-between mb-3">
+            <label className="text-sm font-medium text-foreground/70">Asking Rent Rate</label>
+            <span className="text-sm font-semibold text-[var(--brand-navy)]">
+              {rentRange[0] === 5 && rentRange[1] === 20
+                ? "Any price"
+                : `€${rentRange[0]} – €${rentRange[1]}/sqm`}
+            </span>
+          </div>
+          <RangeSlider
+            min={5}
+            max={20}
+            values={rentRange}
+            ticks={[5, 7, 10, 12.5, 15, 20]}
+            onChange={(next) => {
+              setRentRange(next);
+              onFiltersChange({
+                query: query || undefined,
+                district: district || undefined,
+                status: selectedStatus.length ? selectedStatus : undefined,
+                propertyType: selectedTypes.length ? selectedTypes : undefined,
+                minRent: next[0] > 5 ? next[0] : undefined,
+                maxRent: next[1] < 20 ? next[1] : undefined,
+                minAvailableArea: areaRange[0] > 0 ? areaRange[0] : undefined,
+                maxAvailableArea: areaRange[1] < 5000 ? areaRange[1] : undefined,
+              });
+            }}
+          />
+        </div>
       </div>
 
-      </div>
-      </div>
       {/* Advanced filters */}
       <button
         onClick={() => setShowAdvanced(!showAdvanced)}
