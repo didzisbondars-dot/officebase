@@ -3,6 +3,7 @@
 import { useState, useCallback } from "react";
 import { Search, SlidersHorizontal, X, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { RangeSlider } from "./RangeSlider";
 import type { SearchFilters } from "@/types";
 import {
   STATUS_OPTIONS,
@@ -171,7 +172,7 @@ export function SearchFiltersPanel({
         ))}
       </div>
       {/* Rent rate slider */}
-      <div className="mb-4 w-1/2">
+      <div className="mb-6 w-1/2">
         <div className="flex items-center justify-between mb-3">
           <label className="text-sm font-medium text-foreground/70">Asking Rent Rate</label>
           <span className="text-sm font-semibold text-[var(--brand-navy)]">
@@ -180,63 +181,23 @@ export function SearchFiltersPanel({
               : `€${rentRange[0]} – €${rentRange[1]}/sqm`}
           </span>
         </div>
-        <div className="relative h-6 flex items-center">
-          {/* Track background */}
-          <div className="absolute w-full h-1.5 bg-border rounded-full" />
-          {/* Active range highlight */}
-          <div
-            className="absolute h-1.5 bg-[var(--brand-navy)] rounded-full pointer-events-none"
-            style={{
-              left: `${(rentRange[0] / 20) * 100}%`,
-              right: `${100 - (rentRange[1] / 20) * 100}%`,
-            }}
-          />
-          {/* Min input — left half only */}
-          <input
-            type="range" min={0} max={20} step={1}
-            value={rentRange[0]}
-            onChange={(e) => {
-              const val = Math.min(Number(e.target.value), rentRange[1] - 1);
-              const next: [number, number] = [val, rentRange[1]];
-              setRentRange(next);
-              onFiltersChange({
-                query: query || undefined,
-                district: district || undefined,
-                status: selectedStatus.length ? selectedStatus : undefined,
-                propertyType: selectedTypes.length ? selectedTypes : undefined,
-                minRent: val > 0 ? val : undefined,
-                maxRent: next[1] < 20 ? next[1] : undefined,
-              });
-            }}
-            style={{ position: 'absolute', width: '100%', opacity: 0, height: '100%', zIndex: 3 }}
-          />
-          {/* Max input — full width, lower z so min wins on left */}
-          <input
-            type="range" min={0} max={20} step={1}
-            value={rentRange[1]}
-            onChange={(e) => {
-              const val = Math.max(Number(e.target.value), rentRange[0] + 1);
-              const next: [number, number] = [rentRange[0], val];
-              setRentRange(next);
-              onFiltersChange({
-                query: query || undefined,
-                district: district || undefined,
-                status: selectedStatus.length ? selectedStatus : undefined,
-                propertyType: selectedTypes.length ? selectedTypes : undefined,
-                minRent: next[0] > 0 ? next[0] : undefined,
-                maxRent: val < 20 ? val : undefined,
-              });
-            }}
-            style={{ position: 'absolute', width: '100%', opacity: 0, height: '100%', zIndex: rentRange[1] <= rentRange[0] + 3 ? 5 : 4 }}
-          />
-          {/* Min thumb visual */}
-          <div className="absolute -translate-x-1/2 w-4 h-4 rounded-full bg-white border-2 border-[var(--brand-navy)] shadow-md pointer-events-none" style={{ left: `${(rentRange[0] / 20) * 100}%`, zIndex: 6 }} />
-          {/* Max thumb visual */}
-          <div className="absolute -translate-x-1/2 w-4 h-4 rounded-full bg-white border-2 border-[var(--brand-navy)] shadow-md pointer-events-none" style={{ left: `${(rentRange[1] / 20) * 100}%`, zIndex: 6 }} />
-        </div>
-        <div className="flex justify-between text-xs text-muted-foreground mt-2">
-          <span>€5</span><span>€7</span><span>€10</span><span>€12.5</span><span>€15</span><span>€20</span>
-        </div>
+        <RangeSlider
+          min={0}
+          max={20}
+          values={rentRange}
+          ticks={[5, 7, 10, 12.5, 15, 20]}
+          onChange={(next) => {
+            setRentRange(next);
+            onFiltersChange({
+              query: query || undefined,
+              district: district || undefined,
+              status: selectedStatus.length ? selectedStatus : undefined,
+              propertyType: selectedTypes.length ? selectedTypes : undefined,
+              minRent: next[0] > 0 ? next[0] : undefined,
+              maxRent: next[1] < 20 ? next[1] : undefined,
+            });
+          }}
+        />
       </div>
 
       {/* Advanced filters */}
