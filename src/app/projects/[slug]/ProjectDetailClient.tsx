@@ -16,8 +16,10 @@ export default function ProjectDetailClient({ project }: { project: Project }) {
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
 
-      {/* Full-width hero */}
-      <div className="relative h-[70vh] min-h-[500px] w-full overflow-hidden">
+      {/* Hero */}
+      <div className="bg-white pt-4 pb-0">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="relative h-[45vh] min-h-[320px] w-full overflow-hidden rounded-2xl">
         {images.length > 0 ? (
           <Image src={images[imgIndex].url} alt={project.name} fill className="object-cover transition-all duration-700" priority />
         ) : (
@@ -72,6 +74,10 @@ export default function ProjectDetailClient({ project }: { project: Project }) {
             </p>
           </div>
         </div>
+      </div>
+
+      </div>
+      </div>
       </div>
 
       {/* Main content */}
