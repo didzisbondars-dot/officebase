@@ -170,40 +170,80 @@ export function SearchFiltersPanel({
           </button>
         ))}
       </div>
-
       {/* Rent rate slider */}
-      <div className="mb-4">
-        <div className="flex items-center justify-between mb-2">
+      <div className="mb-4 w-1/2">
+        <div className="flex items-center justify-between mb-3">
           <label className="text-sm font-medium text-foreground/70">Asking Rent Rate</label>
           <span className="text-sm font-semibold text-[var(--brand-navy)]">
-            {rentRange[1] >= 30 ? "Any price" : `up to €${rentRange[1]}/sqm`}
+            {rentRange[0] === 0 && rentRange[1] === 30
+              ? "Any price"
+              : `€${rentRange[0]} – €${rentRange[1]}/sqm`}
           </span>
         </div>
-        <input
-          type="range"
-          min={0}
-          max={30}
-          step={1}
-          value={rentRange[1]}
-          onChange={(e) => {
-            const val = Number(e.target.value);
-            const next: [number, number] = [0, val];
-            setRentRange(next);
-            onFiltersChange({
-              query: query || undefined,
-              city: city || undefined,
-              status: selectedStatus.length ? selectedStatus : undefined,
-              propertyType: selectedTypes.length ? selectedTypes : undefined,
-              maxRent: val < 30 ? val : undefined,
-            });
-          }}
-          className="w-full h-2 bg-border rounded-full appearance-none cursor-pointer accent-[var(--brand-navy)]"
-        />
-        <div className="flex justify-between text-xs text-muted-foreground mt-1">
-          <span>€0</span>
-          <span>€10</span>
-          <span>€20</span>
-          <span>€30+</span>
+        <div className="relative h-5">
+          {/* Track */}
+          <div className="absolute top-1/2 -translate-y-1/2 w-full h-1.5 bg-border rounded-full" />
+          {/* Active range highlight */}
+          <div
+            className="absolute top-1/2 -translate-y-1/2 h-1.5 bg-[var(--brand-navy)] rounded-full pointer-events-none"
+            style={{
+              left: `${(rentRange[0] / 30) * 100}%`,
+              width: `${((rentRange[1] - rentRange[0]) / 30) * 100}%`,
+            }}
+          />
+          {/* Min handle */}
+          <input
+            type="range" min={0} max={30} step={1}
+            value={rentRange[0]}
+            onChange={(e) => {
+              const val = Math.min(Number(e.target.value), rentRange[1] - 1);
+              const next: [number, number] = [val, rentRange[1]];
+              setRentRange(next);
+              onFiltersChange({
+                query: query || undefined,
+                district: district || undefined,
+                status: selectedStatus.length ? selectedStatus : undefined,
+                propertyType: selectedTypes.length ? selectedTypes : undefined,
+                minRent: val > 0 ? val : undefined,
+                maxRent: next[1] < 30 ? next[1] : undefined,
+              });
+            }}
+            className="absolute w-full h-full opacity-0 cursor-pointer"
+            style={{ zIndex: rentRange[0] > 25 ? 5 : 3 }}
+          />
+          {/* Max handle */}
+          <input
+            type="range" min={0} max={30} step={1}
+            value={rentRange[1]}
+            onChange={(e) => {
+              const val = Math.max(Number(e.target.value), rentRange[0] + 1);
+              const next: [number, number] = [rentRange[0], val];
+              setRentRange(next);
+              onFiltersChange({
+                query: query || undefined,
+                district: district || undefined,
+                status: selectedStatus.length ? selectedStatus : undefined,
+                propertyType: selectedTypes.length ? selectedTypes : undefined,
+                minRent: next[0] > 0 ? next[0] : undefined,
+                maxRent: val < 30 ? val : undefined,
+              });
+            }}
+            className="absolute w-full h-full opacity-0 cursor-pointer"
+            style={{ zIndex: 4 }}
+          />
+          {/* Min thumb visual */}
+          <div
+            className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-4 h-4 rounded-full bg-white border-2 border-[var(--brand-navy)] shadow-md pointer-events-none"
+            style={{ left: `${(rentRange[0] / 30) * 100}%`, zIndex: 6 }}
+          />
+          {/* Max thumb visual */}
+          <div
+            className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-4 h-4 rounded-full bg-white border-2 border-[var(--brand-navy)] shadow-md pointer-events-none"
+            style={{ left: `${(rentRange[1] / 30) * 100}%`, zIndex: 6 }}
+          />
+        </div>
+        <div className="flex justify-between text-xs text-muted-foreground mt-2">
+          <span>€0</span><span>€10</span><span>€20</span><span>€30+</span>
         </div>
       </div>
 
