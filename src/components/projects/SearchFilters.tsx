@@ -180,18 +180,18 @@ export function SearchFiltersPanel({
               : `€${rentRange[0]} – €${rentRange[1]}/sqm`}
           </span>
         </div>
-        <div className="relative h-5">
-          {/* Track */}
-          <div className="absolute top-1/2 -translate-y-1/2 w-full h-1.5 bg-border rounded-full" />
-          {/* Active range highlight */}
+        <div className="relative h-6 flex items-center">
+          {/* Track background */}
+          <div className="absolute w-full h-1.5 bg-border rounded-full" />
+          {/* Active range */}
           <div
-            className="absolute top-1/2 -translate-y-1/2 h-1.5 bg-[var(--brand-navy)] rounded-full pointer-events-none"
+            className="absolute h-1.5 bg-[var(--brand-navy)] rounded-full pointer-events-none"
             style={{
               left: `${(rentRange[0] / 30) * 100}%`,
-              width: `${((rentRange[1] - rentRange[0]) / 30) * 100}%`,
+              right: `${100 - (rentRange[1] / 30) * 100}%`,
             }}
           />
-          {/* Min handle */}
+          {/* Min input - covers left portion only */}
           <input
             type="range" min={0} max={30} step={1}
             value={rentRange[0]}
@@ -209,9 +209,9 @@ export function SearchFiltersPanel({
               });
             }}
             className="absolute w-full h-full opacity-0 cursor-pointer"
-            style={{ zIndex: rentRange[0] > 25 ? 5 : 3 }}
+            style={{ zIndex: rentRange[0] >= rentRange[1] - 2 ? 5 : 4 }}
           />
-          {/* Max handle */}
+          {/* Max input */}
           <input
             type="range" min={0} max={30} step={1}
             value={rentRange[1]}
@@ -229,16 +229,16 @@ export function SearchFiltersPanel({
               });
             }}
             className="absolute w-full h-full opacity-0 cursor-pointer"
-            style={{ zIndex: 4 }}
+            style={{ zIndex: 3 }}
           />
-          {/* Min thumb visual */}
+          {/* Min thumb */}
           <div
-            className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-4 h-4 rounded-full bg-white border-2 border-[var(--brand-navy)] shadow-md pointer-events-none"
+            className="absolute -translate-x-1/2 w-4 h-4 rounded-full bg-white border-2 border-[var(--brand-navy)] shadow-md pointer-events-none"
             style={{ left: `${(rentRange[0] / 30) * 100}%`, zIndex: 6 }}
           />
-          {/* Max thumb visual */}
+          {/* Max thumb */}
           <div
-            className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-4 h-4 rounded-full bg-white border-2 border-[var(--brand-navy)] shadow-md pointer-events-none"
+            className="absolute -translate-x-1/2 w-4 h-4 rounded-full bg-white border-2 border-[var(--brand-navy)] shadow-md pointer-events-none"
             style={{ left: `${(rentRange[1] / 30) * 100}%`, zIndex: 6 }}
           />
         </div>
