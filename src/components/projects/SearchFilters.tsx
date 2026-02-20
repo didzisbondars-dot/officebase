@@ -183,7 +183,7 @@ export function SearchFiltersPanel({
         <div className="relative h-6 flex items-center">
           {/* Track background */}
           <div className="absolute w-full h-1.5 bg-border rounded-full" />
-          {/* Active range */}
+          {/* Active range highlight */}
           <div
             className="absolute h-1.5 bg-[var(--brand-navy)] rounded-full pointer-events-none"
             style={{
@@ -191,7 +191,7 @@ export function SearchFiltersPanel({
               right: `${100 - (rentRange[1] / 30) * 100}%`,
             }}
           />
-          {/* Min input - clipped to left portion */}
+          {/* Min input — left half only */}
           <input
             type="range" min={0} max={30} step={1}
             value={rentRange[0]}
@@ -208,13 +208,9 @@ export function SearchFiltersPanel({
                 maxRent: next[1] < 30 ? next[1] : undefined,
               });
             }}
-            className="absolute w-full h-full opacity-0 cursor-pointer"
-            style={{
-              zIndex: 5,
-              clipPath: `inset(0 ${100 - (rentRange[0] / 30) * 100 + 10}% 0 0)`
-            }}
+            style={{ position: 'absolute', width: '100%', opacity: 0, height: '100%', zIndex: 3 }}
           />
-          {/* Max input - clipped to right portion */}
+          {/* Max input — full width, lower z so min wins on left */}
           <input
             type="range" min={0} max={30} step={1}
             value={rentRange[1]}
@@ -231,22 +227,12 @@ export function SearchFiltersPanel({
                 maxRent: val < 30 ? val : undefined,
               });
             }}
-            className="absolute w-full h-full opacity-0 cursor-pointer"
-            style={{
-              zIndex: 4,
-              clipPath: `inset(0 0 0 ${(rentRange[1] / 30) * 100 - 10}%)`
-            }}
+            style={{ position: 'absolute', width: '100%', opacity: 0, height: '100%', zIndex: rentRange[1] <= rentRange[0] + 3 ? 5 : 4 }}
           />
-          {/* Min thumb */}
-          <div
-            className="absolute -translate-x-1/2 w-4 h-4 rounded-full bg-white border-2 border-[var(--brand-navy)] shadow-md pointer-events-none"
-            style={{ left: `${(rentRange[0] / 30) * 100}%`, zIndex: 6 }}
-          />
-          {/* Max thumb */}
-          <div
-            className="absolute -translate-x-1/2 w-4 h-4 rounded-full bg-white border-2 border-[var(--brand-navy)] shadow-md pointer-events-none"
-            style={{ left: `${(rentRange[1] / 30) * 100}%`, zIndex: 6 }}
-          />
+          {/* Min thumb visual */}
+          <div className="absolute -translate-x-1/2 w-4 h-4 rounded-full bg-white border-2 border-[var(--brand-navy)] shadow-md pointer-events-none" style={{ left: `${(rentRange[0] / 30) * 100}%`, zIndex: 6 }} />
+          {/* Max thumb visual */}
+          <div className="absolute -translate-x-1/2 w-4 h-4 rounded-full bg-white border-2 border-[var(--brand-navy)] shadow-md pointer-events-none" style={{ left: `${(rentRange[1] / 30) * 100}%`, zIndex: 6 }} />
         </div>
         <div className="flex justify-between text-xs text-muted-foreground mt-2">
           <span>€0</span><span>€10</span><span>€20</span><span>€30+</span>
