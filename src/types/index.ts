@@ -101,7 +101,9 @@ export const CERTIFICATION_OPTIONS = [
 
 export const STATUS_OPTIONS = [
   "Available",
-  "Under Construction",
+  "Under construction",
+  "Fully leased out",
+  "Planing stage",
 ] as const;
 
 export const PROPERTY_TYPE_OPTIONS = [
