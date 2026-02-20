@@ -160,7 +160,7 @@ export function SearchFiltersPanel({
         {[
             { value: "A", label: "Grade A" },
             { value: "B", label: "Grade B" },
-            { value: "B/C", label: "Grade B/C" },
+            { value: "C", label: "Grade C" },
           ].map(({ value, label }) => (
           <button
             key={value}

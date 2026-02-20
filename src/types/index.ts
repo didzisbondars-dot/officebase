@@ -109,4 +109,4 @@ export const STATUS_OPTIONS = [
   "Planing stage",
 ] as const;
 
-export const PROPERTY_TYPE_OPTIONS = ["A", "B", "B/C"] as const;
+export const PROPERTY_TYPE_OPTIONS = ["A", "B", "C"] as const;
