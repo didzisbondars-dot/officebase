@@ -182,7 +182,7 @@ export function SearchFiltersPanel({
           </span>
         </div>
         <RangeSlider
-          min={0}
+          min={5}
           max={20}
           values={rentRange}
           ticks={[5, 7, 10, 12.5, 15, 20]}
