@@ -32,7 +32,6 @@ export function SearchFiltersPanel({
   const [minArea, setMinArea] = useState("");
   const [rentRange, setRentRange] = useState<[number, number]>([5, 20]);
   const [areaRange, setAreaRange] = useState<[number, number]>([0, 5000]);
-  const [areaRange, setAreaRange] = useState<[number, number]>([0, 5000]);
   const [maxArea, setMaxArea] = useState("");
 
   const applyFilters = useCallback(
