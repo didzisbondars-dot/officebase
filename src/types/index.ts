@@ -61,8 +61,6 @@ export interface SearchFilters {
   minArea?: number;
   maxArea?: number;
   minRent?: number;
-  minArea?: number;
-  maxArea?: number;
   minAvailableArea?: number;
   maxAvailableArea?: number;
   maxRent?: number;
