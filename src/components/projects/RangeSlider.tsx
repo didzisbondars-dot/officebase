@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useCallback, useEffect } from "react";
+import { useRef, useEffect } from "react";
 
 interface RangeSliderProps {
   min: number;
@@ -13,21 +13,26 @@ interface RangeSliderProps {
 export function RangeSlider({ min, max, values, onChange, ticks }: RangeSliderProps) {
   const trackRef = useRef<HTMLDivElement>(null);
   const valuesRef = useRef<[number, number]>(values);
+  const onChangeRef = useRef(onChange);
+
+  // Keep refs in sync — no stale closures
   useEffect(() => { valuesRef.current = values; }, [values]);
+  useEffect(() => { onChangeRef.current = onChange; }, [onChange]);
 
   const getPercent = (val: number) => ((val - min) / (max - min)) * 100;
 
-  const snap = useCallback((raw: number) => {
+  const snap = (raw: number) => {
     const clamped = Math.max(min, Math.min(max, raw));
-    if (!ticks) return Math.round(clamped);
+    if (!ticks || ticks.length === 0) return Math.round(clamped);
     return ticks.reduce((prev, curr) =>
       Math.abs(curr - clamped) < Math.abs(prev - clamped) ? curr : prev
     );
-  }, [min, max, ticks]);
+  };
 
-  const startDrag = useCallback((which: "min" | "max") => (e: React.MouseEvent | React.TouchEvent) => {
+  const startDrag = (which: "min" | "max") => (e: React.MouseEvent | React.TouchEvent) => {
     e.preventDefault();
     e.stopPropagation();
+
     const move = (ev: MouseEvent | TouchEvent) => {
       const track = trackRef.current;
       if (!track) return;
@@ -36,6 +41,7 @@ export function RangeSlider({ min, max, values, onChange, ticks }: RangeSliderPr
       const pct = Math.min(Math.max((clientX - rect.left) / rect.width, 0), 1);
       const val = snap(pct * (max - min) + min);
       const cur = valuesRef.current;
+
       let next: [number, number];
       if (which === "min") {
         next = [Math.min(val, cur[1] - 1), cur[1]];
@@ -43,19 +49,21 @@ export function RangeSlider({ min, max, values, onChange, ticks }: RangeSliderPr
         next = [cur[0], Math.max(val, cur[0] + 1)];
       }
       valuesRef.current = next;
-      onChange(next);
+      onChangeRef.current(next);
     };
+
     const up = () => {
       window.removeEventListener("mousemove", move);
       window.removeEventListener("mouseup", up);
       window.removeEventListener("touchmove", move);
       window.removeEventListener("touchend", up);
     };
+
     window.addEventListener("mousemove", move);
     window.addEventListener("mouseup", up);
     window.addEventListener("touchmove", move);
     window.addEventListener("touchend", up);
-  }, [min, max, snap, onChange]);
+  };
 
   return (
     <div className="w-full select-none">
