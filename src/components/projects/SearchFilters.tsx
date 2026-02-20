@@ -191,7 +191,7 @@ export function SearchFiltersPanel({
               right: `${100 - (rentRange[1] / 30) * 100}%`,
             }}
           />
-          {/* Min input - covers left portion only */}
+          {/* Min input - clipped to left portion */}
           <input
             type="range" min={0} max={30} step={1}
             value={rentRange[0]}
@@ -209,9 +209,12 @@ export function SearchFiltersPanel({
               });
             }}
             className="absolute w-full h-full opacity-0 cursor-pointer"
-            style={{ zIndex: rentRange[0] >= rentRange[1] - 2 ? 5 : 4 }}
+            style={{
+              zIndex: 5,
+              clipPath: `inset(0 ${100 - (rentRange[0] / 30) * 100 + 10}% 0 0)`
+            }}
           />
-          {/* Max input */}
+          {/* Max input - clipped to right portion */}
           <input
             type="range" min={0} max={30} step={1}
             value={rentRange[1]}
@@ -229,7 +232,10 @@ export function SearchFiltersPanel({
               });
             }}
             className="absolute w-full h-full opacity-0 cursor-pointer"
-            style={{ zIndex: 3 }}
+            style={{
+              zIndex: 4,
+              clipPath: `inset(0 0 0 ${(rentRange[1] / 30) * 100 - 10}%)`
+            }}
           />
           {/* Min thumb */}
           <div
