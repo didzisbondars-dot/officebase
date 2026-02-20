@@ -30,7 +30,7 @@ export function SearchFiltersPanel({
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [district, setDistrict] = useState("");
   const [minArea, setMinArea] = useState("");
-  const [rentRange, setRentRange] = useState<[number, number]>([0, 20]);
+  const [rentRange, setRentRange] = useState<[number, number]>([5, 20]);
   const [maxArea, setMaxArea] = useState("");
 
   const applyFilters = useCallback(
@@ -96,7 +96,7 @@ export function SearchFiltersPanel({
   };
 
   const hasFilters =
-    query || city || selectedStatus.length || selectedTypes.length || minArea || maxArea || rentRange[0] > 0 || rentRange[1] < 20;
+    query || city || selectedStatus.length || selectedTypes.length || minArea || maxArea || rentRange[0] > 5 || rentRange[1] < 20;
 
   return (
     <div className={cn("bg-white rounded-2xl border border-border p-5", className)}>
@@ -176,7 +176,7 @@ export function SearchFiltersPanel({
         <div className="flex items-center justify-between mb-3">
           <label className="text-sm font-medium text-foreground/70">Asking Rent Rate</label>
           <span className="text-sm font-semibold text-[var(--brand-navy)]">
-            {rentRange[0] === 0 && rentRange[1] === 20
+            {rentRange[0] === 5 && rentRange[1] === 20
               ? "Any price"
               : `€${rentRange[0]} – €${rentRange[1]}/sqm`}
           </span>
