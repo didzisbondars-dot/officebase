@@ -132,6 +132,31 @@ export default function ProjectDetailClient({ project }: { project: Project }) {
               </div>
             )}
 
+            {/* Map */}
+            {project.latitude && project.longitude && (
+              <div className="bg-white rounded-2xl shadow-xl shadow-slate-200/60 overflow-hidden">
+                <div className="p-6 pb-3">
+                  <h2 className="font-display text-xl text-slate-800">Location</h2>
+                  <p className="text-sm text-slate-500 mt-1">{project.address}{project.district ? `, ${project.district}` : ""}, {project.city}</p>
+                </div>
+                <div className="relative h-80 w-full">
+                  <img
+                    src={`https://api.mapbox.com/styles/v1/mapbox/light-v11/static/pin-l+0f1f3d(${project.longitude},${project.latitude})/${project.longitude},${project.latitude},15,0/800x320@2x?access_token=${process.env.NEXT_PUBLIC_MAPBOX_TOKEN}`}
+                    alt="Project location map"
+                    className="w-full h-full object-cover"
+                  />
+                  
+                    href={`https://www.google.com/maps?q=${project.latitude},${project.longitude}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="absolute bottom-3 right-3 bg-white text-xs px-3 py-1.5 rounded-full shadow-md text-slate-700 hover:bg-slate-50 transition-all"
+                  >
+                    Open in Google Maps ↗
+                  </a>
+                </div>
+              </div>
+            )}
+
             {/* Amenities */}
             {project.amenities.length > 0 && (
               <div className="bg-white rounded-2xl shadow-xl shadow-slate-200/60 p-6">

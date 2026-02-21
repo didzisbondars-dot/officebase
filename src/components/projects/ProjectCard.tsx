@@ -129,7 +129,7 @@ export function ProjectCard({ project, className }: ProjectCardProps) {
             <MapPin className="w-3.5 h-3.5 shrink-0" />
             <span className="truncate">{project.district}, {project.city}</span>
           </div>
-          <p className="text-sm text-muted-foreground leading-relaxed mb-4">{truncate(project.description, 90)}</p>
+          <p className="text-sm text-muted-foreground leading-relaxed mb-4">{truncate(project.description || "", 90)}</p>
           <div className="flex items-center gap-4 pt-3 border-t border-border">
             <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
               <Maximize2 className="w-3.5 h-3.5" />
