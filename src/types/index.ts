@@ -17,6 +17,8 @@ export interface Project {
   maxUnitSize: number; // sqm
   salePricePerSqm?: number;
   availableArea: number;
+  parkingGround: number | null;
+  parkingUnderground: number | null;
   rentPricePerSqm?: number;
   floors: number;
   completionDate?: string;

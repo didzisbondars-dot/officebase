@@ -99,6 +99,8 @@ export default function ProjectDetailClient({ project }: { project: Project }) {
                   { icon: Maximize2, label: "GLA", value: project.minUnitSize ? formatArea(project.minUnitSize) : "—" },
                   { icon: User, label: "Owner", value: project.developer || "—" },
                   { icon: Building2, label: "District", value: project.district || "—" },
+                  ...(project.parkingGround ? [{ icon: Maximize2, label: "Ground Parking", value: `${project.parkingGround} spaces` }] : []),
+                  ...(project.parkingUnderground ? [{ icon: Maximize2, label: "Underground Parking", value: `${project.parkingUnderground} spaces` }] : []),
                 ].map(({ icon: Icon, label, value }) => (
                   <div key={label} className="px-4 first:pl-0 last:pr-0 flex flex-col gap-1">
                     <div className="flex items-center gap-1.5 text-slate-400">
