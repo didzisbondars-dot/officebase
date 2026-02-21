@@ -2,170 +2,225 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
-import { ArrowLeft, MapPin, Building2, Maximize2, User, Images, ChevronLeft, ChevronRight, X } from "lucide-react";
+import { useState, useEffect } from "react";
+import { ArrowLeft, MapPin, ChevronLeft, ChevronRight, X, Images, Car, ParkingSquare } from "lucide-react";
 import type { Project } from "@/types";
 import { formatArea, getStatusDot, cn } from "@/lib/utils";
-import { MapboxMap } from "@/components/map/MapboxMap";
 import { LeadForm } from "@/components/projects/LeadForm";
 import { DownloadPDF } from "@/components/projects/DownloadPDF";
+import { MapboxMap } from "@/components/map/MapboxMap";
 
 export default function ProjectDetailClient({ project }: { project: Project }) {
   const [imgIndex, setImgIndex] = useState(0);
   const [galleryOpen, setGalleryOpen] = useState(false);
+  const [loaded, setLoaded] = useState(false);
   const images = project.images;
 
+  useEffect(() => {
+    const t = setTimeout(() => setLoaded(true), 60);
+    return () => clearTimeout(t);
+  }, []);
+
+  const stats = [
+    { label: "Total Area", value: project.totalArea ? formatArea(project.totalArea) : null },
+    { label: "GLA", value: project.minUnitSize ? formatArea(project.minUnitSize) : null },
+    { label: "Available", value: (project as any).availableArea ? formatArea((project as any).availableArea) : null },
+    { label: "Owner", value: project.developer || null },
+    { label: "District", value: project.district || null },
+    { label: "Class", value: project.propertyType ? `Class ${project.propertyType}` : null },
+    { label: "Ground Parking", value: (project as any).parkingGround ? `${(project as any).parkingGround} spaces` : null },
+    { label: "Underground", value: (project as any).parkingUnderground ? `${(project as any).parkingUnderground} spaces` : null },
+  ].filter(s => s.value);
+
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
-      <div className="bg-white pt-4 pb-0">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="relative h-[45vh] min-h-[320px] w-full overflow-hidden rounded-2xl">
-            {images.length > 0 ? (
-              <Image src={images[imgIndex].url} alt={project.name} fill className="object-cover transition-all duration-700" priority />
-            ) : (
-              <div className="absolute inset-0 bg-gradient-to-br from-slate-800 to-slate-900" />
-            )}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-black/10" />
-            <div className="absolute top-6 left-6 z-20 pt-16">
-              <Link href="/projects" className="inline-flex items-center gap-2 text-white/80 hover:text-white text-sm bg-black/30 hover:bg-black/50 backdrop-blur-sm px-4 py-2 rounded-full transition-all">
-                <ArrowLeft className="w-4 h-4" /> Back
-              </Link>
-            </div>
-            <div className="absolute top-6 right-6 z-20 pt-16">
-              <DownloadPDF project={project} />
-            </div>
-            {images.length > 1 && (
-              <button onClick={() => setGalleryOpen(true)} className="absolute bottom-6 right-6 z-20 inline-flex items-center gap-2 text-white text-sm bg-black/40 hover:bg-black/60 backdrop-blur-sm px-4 py-2.5 rounded-full transition-all border border-white/20">
-                <Images className="w-4 h-4" />
-                View all {images.length} photos
-              </button>
-            )}
-            {images.length > 1 && (
-              <>
-                <button onClick={() => setImgIndex((i) => (i - 1 + images.length) % images.length)} className="absolute left-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-black/40 hover:bg-black/60 backdrop-blur-sm flex items-center justify-center text-white transition-all border border-white/10">
-                  <ChevronLeft className="w-5 h-5" />
-                </button>
-                <button onClick={() => setImgIndex((i) => (i + 1) % images.length)} className="absolute right-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-black/40 hover:bg-black/60 backdrop-blur-sm flex items-center justify-center text-white transition-all border border-white/10">
-                  <ChevronRight className="w-5 h-5" />
-                </button>
-              </>
-            )}
-            <div className="absolute bottom-0 left-0 right-0 z-10 p-8 md:p-12">
-              <div className="flex items-center gap-2 mb-3">
-                <span className={cn("inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1 rounded-full bg-white/15 backdrop-blur-sm text-white border border-white/20")}>
+    <div className="min-h-screen bg-[#f8f6f2]">
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap');
+        .font-cormorant { font-family: 'Cormorant Garamond', serif; }
+        .font-dm { font-family: 'DM Sans', sans-serif; }
+        .fade-up { opacity: 0; transform: translateY(18px); transition: opacity 0.7s cubic-bezier(.22,1,.36,1), transform 0.7s cubic-bezier(.22,1,.36,1); }
+        .fade-up.in { opacity: 1; transform: translateY(0); }
+        .stat-item { border-bottom: 1px solid rgba(0,0,0,0.08); }
+        .stat-item:last-child { border-bottom: none; }
+        .img-thumb { transition: opacity 0.2s; }
+        .img-thumb:hover { opacity: 1 !important; }
+      `}</style>
+
+      {/* Full viewport hero */}
+      <div className="relative w-full" style={{ height: '100vh', maxHeight: '780px', minHeight: '520px' }}>
+
+        {/* Image */}
+        {images.length > 0 ? (
+          <Image src={images[imgIndex].url} alt={project.name} fill className="object-cover" priority />
+        ) : (
+          <div className="absolute inset-0 bg-gradient-to-br from-[#1a1a1a] to-[#2d2d2d]" />
+        )}
+
+        {/* Gradient overlay — heavier at bottom for text legibility */}
+        <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, rgba(0,0,0,0.25) 0%, rgba(0,0,0,0.05) 40%, rgba(0,0,0,0.6) 75%, rgba(0,0,0,0.88) 100%)' }} />
+
+        {/* Top bar */}
+        <div className={`absolute top-0 left-0 right-0 z-20 flex items-center justify-between px-8 pt-8 fade-up ${loaded ? 'in' : ''}`} style={{ transitionDelay: '0ms' }}>
+          <Link href="/projects" className="font-dm inline-flex items-center gap-2 text-white/70 hover:text-white text-xs tracking-widest uppercase transition-colors">
+            <ArrowLeft className="w-3.5 h-3.5" /> All Projects
+          </Link>
+          <DownloadPDF project={project} />
+        </div>
+
+        {/* Image counter + gallery trigger */}
+        {images.length > 1 && (
+          <button onClick={() => setGalleryOpen(true)} className={`font-dm absolute top-8 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2 text-white/60 hover:text-white text-xs tracking-widest uppercase transition-colors fade-up ${loaded ? 'in' : ''}`} style={{ transitionDelay: '100ms' }}>
+            <Images className="w-3.5 h-3.5" />
+            {imgIndex + 1} / {images.length}
+          </button>
+        )}
+
+        {/* Arrow navigation */}
+        {images.length > 1 && (
+          <>
+            <button onClick={() => setImgIndex(i => (i - 1 + images.length) % images.length)} className="absolute left-6 top-1/2 -translate-y-1/2 z-20 w-11 h-11 rounded-full border border-white/20 bg-black/20 backdrop-blur-sm flex items-center justify-center text-white hover:bg-black/40 transition-all">
+              <ChevronLeft className="w-5 h-5" />
+            </button>
+            <button onClick={() => setImgIndex(i => (i + 1) % images.length)} className="absolute right-6 top-1/2 -translate-y-1/2 z-20 w-11 h-11 rounded-full border border-white/20 bg-black/20 backdrop-blur-sm flex items-center justify-center text-white hover:bg-black/40 transition-all">
+              <ChevronRight className="w-5 h-5" />
+            </button>
+          </>
+        )}
+
+        {/* Bottom hero content */}
+        <div className="absolute bottom-0 left-0 right-0 z-10 px-8 md:px-14 pb-10">
+          <div className="max-w-7xl mx-auto">
+            <div className={`fade-up ${loaded ? 'in' : ''}`} style={{ transitionDelay: '120ms' }}>
+              <div className="flex items-center gap-3 mb-4">
+                <span className="font-dm inline-flex items-center gap-1.5 text-[10px] tracking-[0.2em] uppercase px-3 py-1.5 rounded-full border border-white/25 text-white/80 backdrop-blur-sm">
                   <span className={cn("w-1.5 h-1.5 rounded-full", getStatusDot(project.status))} />
                   {project.status}
                 </span>
-                <span className="text-xs font-medium px-3 py-1 rounded-full bg-[var(--brand-gold)]/90 text-white">
+                <span className="font-dm text-[10px] tracking-[0.2em] uppercase px-3 py-1.5 rounded-full text-white/80" style={{ background: 'rgba(200,136,42,0.7)', backdropFilter: 'blur(8px)' }}>
                   Class {project.propertyType}
                 </span>
               </div>
-              <h1 className="font-display text-4xl md:text-6xl text-white mb-3 drop-shadow-lg">{project.name}</h1>
-              <p className="text-white/70 flex items-center gap-1.5 text-sm">
-                <MapPin className="w-4 h-4" />{project.address}{project.district ? `, ${project.district}` : ""}, {project.city}
+              <h1 className="font-cormorant text-white mb-3 leading-none" style={{ fontSize: 'clamp(2.8rem, 6vw, 5.5rem)', fontWeight: 300, letterSpacing: '-0.01em' }}>
+                {project.name}
+              </h1>
+              <p className="font-dm text-white/55 text-xs tracking-widest uppercase flex items-center gap-2">
+                <MapPin className="w-3 h-3" />
+                {project.address}{project.district ? `, ${project.district}` : ""}, Riga
               </p>
             </div>
+
+            {/* Thumbnail strip */}
+            {images.length > 1 && (
+              <div className={`flex gap-2 mt-5 fade-up ${loaded ? 'in' : ''}`} style={{ transitionDelay: '200ms' }}>
+                {images.slice(0, 6).map((img, i) => (
+                  <button key={img.id} onClick={() => setImgIndex(i)} className={cn("relative w-14 h-9 rounded overflow-hidden shrink-0 transition-all img-thumb", i === imgIndex ? "ring-2 ring-[#c8882a] opacity-100" : "opacity-40")}>
+                    <Image src={img.url} alt="" fill className="object-cover" />
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8 relative z-10 pb-20">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-2 space-y-6">
-            <div className="bg-white rounded-2xl shadow-xl shadow-slate-200/60 p-6">
-              <div className="grid grid-cols-2 md:grid-cols-4 divide-x divide-slate-100">
-                {[
-                  { icon: Maximize2, label: "Total Area", value: project.totalArea ? formatArea(project.totalArea) : "—" },
-                  { icon: Maximize2, label: "GLA", value: project.minUnitSize ? formatArea(project.minUnitSize) : "—" },
-                  { icon: User, label: "Owner", value: project.developer || "—" },
-                  { icon: Building2, label: "District", value: project.district || "—" },
-                  ...(project.parkingGround ? [{ icon: Maximize2, label: "Ground Parking", value: `${project.parkingGround} spaces` }] : []),
-                  ...(project.parkingUnderground ? [{ icon: Maximize2, label: "Underground Parking", value: `${project.parkingUnderground} spaces` }] : []),
-                ].map(({ icon: Icon, label, value }) => (
-                  <div key={label} className="px-4 first:pl-0 last:pr-0 flex flex-col gap-1">
-                    <div className="flex items-center gap-1.5 text-slate-400">
-                      <Icon className="w-3.5 h-3.5" />
-                      <span className="text-xs uppercase tracking-wider font-medium">{label}</span>
-                    </div>
-                    <span className="text-sm font-semibold text-slate-800 truncate">{value}</span>
-                  </div>
-                ))}
-              </div>
+      {/* Main content */}
+      <div className="max-w-7xl mx-auto px-6 md:px-14 py-14">
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-10">
+
+          {/* Left col — 3/5 */}
+          <div className="lg:col-span-3 space-y-10">
+
+            {/* Stats — editorial horizontal list */}
+            <div className={`fade-up ${loaded ? 'in' : ''}`} style={{ transitionDelay: '250ms' }}>
               {!!project.rentPricePerSqm && project.rentPricePerSqm > 0 && (
-                <div className="mt-5 pt-5 border-t border-slate-100 flex items-center justify-between">
-                  <span className="text-sm text-slate-500">Asking Rent Rate</span>
-                  <div className="flex items-baseline gap-1">
-                    <span className="text-4xl font-bold text-[var(--brand-navy)]">€{project.rentPricePerSqm}</span>
-                    <span className="text-sm text-slate-400">/ sqm / mo</span>
+                <div className="mb-8 pb-8 border-b border-black/8">
+                  <p className="font-dm text-[10px] tracking-[0.2em] uppercase text-black/35 mb-1">Asking Rent Rate</p>
+                  <div className="flex items-baseline gap-2">
+                    <span className="font-cormorant text-[#1a1a1a]" style={{ fontSize: '4rem', fontWeight: 300, lineHeight: 1 }}>€{project.rentPricePerSqm}</span>
+                    <span className="font-dm text-xs text-black/35 tracking-wider">/ sqm / month</span>
                   </div>
                 </div>
               )}
+
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-0">
+                {stats.map((s, i) => (
+                  <div key={s.label} className="stat-item py-4 pr-6">
+                    <p className="font-dm text-[9px] tracking-[0.22em] uppercase text-black/35 mb-1">{s.label}</p>
+                    <p className="font-cormorant text-[#1a1a1a]" style={{ fontSize: '1.3rem', fontWeight: 400 }}>{s.value}</p>
+                  </div>
+                ))}
+              </div>
             </div>
 
+            {/* Description */}
             {project.description && (
-              <div className="bg-white rounded-2xl shadow-xl shadow-slate-200/60 p-6">
-                <h2 className="font-display text-xl text-slate-800 mb-3">About this property</h2>
-                <p className="text-slate-600 leading-relaxed text-sm">{project.description}</p>
+              <div className={`fade-up ${loaded ? 'in' : ''}`} style={{ transitionDelay: '300ms' }}>
+                <p className="font-dm text-[10px] tracking-[0.2em] uppercase text-black/30 mb-4">About</p>
+                <p className="font-dm text-[#3a3a3a] leading-relaxed" style={{ fontSize: '0.9rem', fontWeight: 300 }}>{project.description}</p>
               </div>
             )}
 
-            {project.latitude && project.longitude && (
-              <div className="bg-white rounded-2xl shadow-xl shadow-slate-200/60 overflow-hidden">
-                <div className="p-6 pb-3">
-                  <h2 className="font-display text-xl text-slate-800">Location</h2>
-                  <p className="text-sm text-slate-500 mt-1">{project.address}{project.district ? `, ${project.district}` : ""}, {project.city}</p>
-                </div>
-                <div className="relative h-80 w-full">
-                  <MapboxMap latitude={project.latitude} longitude={project.longitude} zoom={11} />
-                  <a href={`https://www.google.com/maps?q=${project.latitude},${project.longitude}`} target="_blank" rel="noopener noreferrer" className="absolute bottom-3 right-3 z-10 bg-white text-xs px-3 py-1.5 rounded-full shadow-md text-slate-700 hover:bg-slate-50 transition-all">
-                    Open in Google Maps ↗
-                  </a>
-                </div>
-              </div>
-            )}
-
+            {/* Amenities */}
             {project.amenities.length > 0 && (
-              <div className="bg-white rounded-2xl shadow-xl shadow-slate-200/60 p-6">
-                <h2 className="font-display text-xl text-slate-800 mb-4">Amenities</h2>
+              <div className={`fade-up ${loaded ? 'in' : ''}`} style={{ transitionDelay: '340ms' }}>
+                <p className="font-dm text-[10px] tracking-[0.2em] uppercase text-black/30 mb-4">Amenities</p>
                 <div className="flex flex-wrap gap-2">
                   {project.amenities.map(a => (
-                    <span key={a} className="text-xs text-slate-600 bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-full">{a}</span>
+                    <span key={a} className="font-dm text-[11px] tracking-wide text-[#3a3a3a] px-3 py-1.5 border border-black/10 rounded-full">{a}</span>
                   ))}
                 </div>
               </div>
             )}
+
+            {/* Map */}
+            {project.latitude && project.longitude && (
+              <div className={`fade-up ${loaded ? 'in' : ''}`} style={{ transitionDelay: '380ms' }}>
+                <p className="font-dm text-[10px] tracking-[0.2em] uppercase text-black/30 mb-4">Location</p>
+                <div className="relative rounded-xl overflow-hidden" style={{ height: '340px' }}>
+                  <MapboxMap latitude={project.latitude} longitude={project.longitude} zoom={12} />
+                  <a href={`https://www.google.com/maps?q=${project.latitude},${project.longitude}`} target="_blank" rel="noopener noreferrer" className="font-dm absolute bottom-4 right-4 z-10 bg-white text-[10px] tracking-widest uppercase px-4 py-2 rounded-full shadow-lg text-[#1a1a1a] hover:bg-[#f8f6f2] transition-all">
+                    Open Maps ↗
+                  </a>
+                </div>
+              </div>
+            )}
           </div>
 
-          <div className="lg:col-span-1">
+          {/* Right col — 2/5 sticky lead form */}
+          <div className="lg:col-span-2">
             <div className="sticky top-24">
-              <LeadForm projectName={project.name} projectId={project.id} />
+              <div className={`fade-up ${loaded ? 'in' : ''}`} style={{ transitionDelay: '200ms' }}>
+                <p className="font-dm text-[10px] tracking-[0.2em] uppercase text-black/30 mb-4">Enquire About This Property</p>
+                <LeadForm projectName={project.name} projectId={project.id} />
+              </div>
             </div>
           </div>
         </div>
       </div>
 
+      {/* Gallery modal */}
       {galleryOpen && (
-        <div className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center">
-          <button onClick={() => setGalleryOpen(false)} className="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-all">
-            <X className="w-5 h-5" />
+        <div className="fixed inset-0 z-50 bg-black/97 flex items-center justify-center" onClick={() => setGalleryOpen(false)}>
+          <button className="absolute top-6 right-6 font-dm text-white/40 hover:text-white text-xs tracking-widest uppercase flex items-center gap-2 transition-colors">
+            <X className="w-4 h-4" /> Close
           </button>
-          <button onClick={() => setImgIndex((i) => (i - 1 + images.length) % images.length)} className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-all">
-            <ChevronLeft className="w-6 h-6" />
+          <button onClick={e => { e.stopPropagation(); setImgIndex(i => (i - 1 + images.length) % images.length); }} className="absolute left-6 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full border border-white/15 flex items-center justify-center text-white/60 hover:text-white hover:border-white/40 transition-all">
+            <ChevronLeft className="w-5 h-5" />
           </button>
-          <button onClick={() => setImgIndex((i) => (i + 1) % images.length)} className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-all">
-            <ChevronRight className="w-6 h-6" />
+          <button onClick={e => { e.stopPropagation(); setImgIndex(i => (i + 1) % images.length); }} className="absolute right-6 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full border border-white/15 flex items-center justify-center text-white/60 hover:text-white hover:border-white/40 transition-all">
+            <ChevronRight className="w-5 h-5" />
           </button>
-          <div className="relative w-full max-w-5xl h-[80vh] mx-8">
+          <div className="relative w-full max-w-5xl h-[75vh] mx-16" onClick={e => e.stopPropagation()}>
             <Image src={images[imgIndex].url} alt={project.name} fill className="object-contain" />
           </div>
-          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 text-white/60 text-sm">{imgIndex + 1} / {images.length}</div>
-          <div className="absolute bottom-16 left-1/2 -translate-x-1/2 flex gap-2 overflow-x-auto max-w-lg px-4">
+          <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-2">
             {images.map((img, i) => (
-              <button key={img.id} onClick={() => setImgIndex(i)} className={cn("relative w-14 h-10 rounded-lg overflow-hidden shrink-0 border-2 transition-all", i === imgIndex ? "border-[var(--brand-gold)]" : "border-transparent opacity-50 hover:opacity-80")}>
+              <button key={img.id} onClick={e => { e.stopPropagation(); setImgIndex(i); }} className={cn("relative w-16 h-10 rounded overflow-hidden img-thumb", i === imgIndex ? "opacity-100 ring-1 ring-[#c8882a]" : "opacity-30")}>
                 <Image src={img.url} alt="" fill className="object-cover" />
               </button>
             ))}
           </div>
+          <p className="font-dm absolute bottom-6 right-8 text-white/25 text-xs tracking-widest">{imgIndex + 1} / {images.length}</p>
         </div>
       )}
     </div>
