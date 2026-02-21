@@ -50,9 +50,10 @@ export function DownloadPDF({ project }: { project: Project }) {
       y += 6;
 
       // Status pill
-      const sc = (project.status as string) === "Available" ? [16, 185, 129] :
-        project.status === "Under construction" ? [245, 158, 11] :
-        project.status === "Fully leased out" ? [239, 68, 68] : [59, 130, 246];
+      const s = project.status as string;
+      const sc = s === "Available" ? [16, 185, 129] :
+        s === "Under construction" ? [245, 158, 11] :
+        s === "Fully leased out" ? [239, 68, 68] : [59, 130, 246];
       doc.setFillColor(sc[0], sc[1], sc[2]);
       doc.roundedRect(M, y, 40, 7, 2, 2, "F");
       doc.setTextColor(255, 255, 255);
