@@ -7,6 +7,7 @@ import { ArrowLeft, MapPin, Building2, Maximize2, User, Images, ChevronLeft, Che
 import type { Project } from "@/types";
 import { formatArea, getStatusDot, cn } from "@/lib/utils";
 import { LeadForm } from "@/components/projects/LeadForm";
+import { DownloadPDF } from "@/components/projects/DownloadPDF";
 
 export default function ProjectDetailClient({ project }: { project: Project }) {
   const [imgIndex, setImgIndex] = useState(0);
@@ -34,6 +35,11 @@ export default function ProjectDetailClient({ project }: { project: Project }) {
           <Link href="/projects" className="inline-flex items-center gap-2 text-white/80 hover:text-white text-sm bg-black/30 hover:bg-black/50 backdrop-blur-sm px-4 py-2 rounded-full transition-all">
             <ArrowLeft className="w-4 h-4" /> Back
           </Link>
+        </div>
+
+        {/* Download PDF */}
+        <div className="absolute top-6 right-6 z-20 pt-16">
+          <DownloadPDF project={project} />
         </div>
 
         {/* Gallery button */}
