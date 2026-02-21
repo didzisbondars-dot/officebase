@@ -6,6 +6,7 @@ import { useState } from "react";
 import { ArrowLeft, MapPin, Building2, Maximize2, User, Images, ChevronLeft, ChevronRight, X } from "lucide-react";
 import type { Project } from "@/types";
 import { formatArea, getStatusDot, cn } from "@/lib/utils";
+import { MapboxMap } from "@/components/map/MapboxMap";
 import { LeadForm } from "@/components/projects/LeadForm";
 import { DownloadPDF } from "@/components/projects/DownloadPDF";
 
@@ -115,12 +116,8 @@ export default function ProjectDetailClient({ project }: { project: Project }) {
                   <p className="text-sm text-slate-500 mt-1">{project.address}{project.district ? `, ${project.district}` : ""}, {project.city}</p>
                 </div>
                 <div className="relative h-80 w-full">
-                  <img
-                    src={`https://api.mapbox.com/styles/v1/mapbox/light-v11/static/pin-l+0f1f3d(${project.longitude},${project.latitude})/${project.longitude},${project.latitude},11,0/800x320@2x?access_token=${process.env.NEXT_PUBLIC_MAPBOX_TOKEN}`}
-                    alt="Project location map"
-                    className="w-full h-full object-cover"
-                  />
-                  <a href={`https://www.google.com/maps?q=${project.latitude},${project.longitude}`} target="_blank" rel="noopener noreferrer" className="absolute bottom-3 right-3 bg-white text-xs px-3 py-1.5 rounded-full shadow-md text-slate-700 hover:bg-slate-50 transition-all">
+                  <MapboxMap latitude={project.latitude} longitude={project.longitude} zoom={11} />
+                  <a href={`https://www.google.com/maps?q=${project.latitude},${project.longitude}`} target="_blank" rel="noopener noreferrer" className="absolute bottom-3 right-3 z-10 bg-white text-xs px-3 py-1.5 rounded-full shadow-md text-slate-700 hover:bg-slate-50 transition-all">
                     Open in Google Maps ↗
                   </a>
                 </div>
