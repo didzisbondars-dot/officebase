@@ -18,6 +18,7 @@ export interface Project {
   salePricePerSqm?: number;
   availableArea: number;
   parkingGround: number | null;
+  description: string | null;
   parkingUnderground: number | null;
   rentPricePerSqm?: number;
   floors: number;

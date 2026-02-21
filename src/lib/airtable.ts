@@ -37,6 +37,7 @@ function transformRecord(record: any): Project {
     maxUnitSize: parseFloat(String(fields["GLA"] || 0).replace(/\s/g, "")) || 0,
     salePricePerSqm: fields["Sale Price per sqm"] ? parseFloat(fields["Sale Price per sqm"]) : undefined,
     availableArea: parseFloat(String(fields["Available area"] || 0)) || 0,
+    description: fields["Description"] || null,
     parkingGround: fields["Parking ground"] ? Number(fields["Parking ground"]) : null,
     parkingUnderground: fields["Parking underground"] ? Number(fields["Parking underground"]) : null,
     rentPricePerSqm: parseFloat(String(fields["Asking rent rate"] || 0)) || 0,
