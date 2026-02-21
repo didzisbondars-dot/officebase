@@ -116,7 +116,7 @@ export default function ProjectDetailClient({ project }: { project: Project }) {
                 </div>
                 <div className="relative h-80 w-full">
                   <img
-                    src={`https://api.mapbox.com/styles/v1/mapbox/light-v11/static/pin-l+0f1f3d(${project.longitude},${project.latitude})/${project.longitude},${project.latitude},15,0/800x320@2x?access_token=${process.env.NEXT_PUBLIC_MAPBOX_TOKEN}`}
+                    src={`https://api.mapbox.com/styles/v1/mapbox/light-v11/static/pin-l+0f1f3d(${project.longitude},${project.latitude})/${project.longitude},${project.latitude},13,0/800x320@2x?access_token=${process.env.NEXT_PUBLIC_MAPBOX_TOKEN}`}
                     alt="Project location map"
                     className="w-full h-full object-cover"
                   />
